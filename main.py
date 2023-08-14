@@ -2,7 +2,7 @@ import sys
 import re 
 
 def soma (operacao):
-    tira_espaco = operacao.replace(" ", "")
+    tira_espaco = re.sub(r'\s+', ' ', operacao)
     lista = re.findall(r'\d+|[+\-]', tira_espaco)
     total = int(lista[0])
     
