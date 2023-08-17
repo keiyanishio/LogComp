@@ -24,7 +24,6 @@ def soma(operacao):
         return None
     
     total = int(lista[0])
-    print(lista)
 
     i = 1
     while i < len(lista):
