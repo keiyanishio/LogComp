@@ -12,8 +12,7 @@ def soma(operacao):
                 lista.append(numero_atual)
                 numero_atual = ""
             else:
-                print("erro")
-                return None
+                raise ValueError("Erro")
             lista.append(i)
         else:
             numero_atual += i
@@ -22,8 +21,7 @@ def soma(operacao):
         lista.append(numero_atual)
     
     if len(lista) < 3 or lista[0] in sinais or lista[len(lista)-1] in sinais:
-        print("erro")
-        return None
+        raise ValueError("Erro")
     
     total = int(lista[0])
 
