@@ -1,42 +1,85 @@
 import sys
 
-def soma(operacao):
-    operacao = operacao.replace(" ", "")
-    sinais = ["+", "-"]
-    lista = []
-    numero_atual = ""
+class Token:
+    def __init__(self, t_type: str, value):
+        self.t_type = t_type
+        self.value = value
+
+class Tokenizer:
+    def __init__(self, source):
+        self.source = source.replace(" ", "").strip()
+        self.position = 0
+        self.next = None
     
-    for i in operacao:
-        if i in sinais:
-            if numero_atual != "":
-                lista.append(numero_atual)
-                numero_atual = ""
+    
+    def selectNext(self):
+        if self.position < len(self.source):
+            current_char = self.source[self.position]
+
+            if current_char.isdigit():
+                value = ""
+                while self.position < len(self.source) and self.source[self.position].isdigit():
+                    value += self.source[self.position]
+                    self.position += 1
+                self.next = Token('INT', int(value))
+
+            elif current_char == "+":
+                self.next = Token('PLUS', '+')
+                self.position += 1
+
+            elif current_char == "-":
+                self.next = Token('MINUS', '-') 
+                self.position += 1
+                
+            elif current_char == " ":
+                self.position += 1
+
             else:
-                raise ValueError("Erro")
-            lista.append(i)
-        else:
-            numero_atual += i
-    
-    if numero_atual != "":
-        lista.append(numero_atual)
-    
-    if len(lista) < 3 or lista[0] in sinais or lista[len(lista)-1] in sinais:
-        raise ValueError("Erro")
-    
-    total = int(lista[0])
+                raise SyntaxError("Erro: Caractere inválido")
 
-    i = 1
-    while i < len(lista):
-        
-        if lista[i] == '-':
-            total -= int(lista[i + 1])
         else:
-            total += int(lista[i + 1])
-        i += 2 
+            self.next = Token('EOF', '')
         
-    
-    print(total)
-    return total
+        
+class Parser:
+    tokenizer = None
+    def parseExpression(self):
+        num = 0
+        result = self.tokenizer.selectNext()
+        if self.tokenizer.next.t_type == 'INT':
+            result = self.tokenizer.next.value
+            self.tokenizer.selectNext()
+            while self.tokenizer.next.t_type == 'PLUS' or self.tokenizer.next.t_type == 'MINUS':
+                if self.tokenizer.next.value == '+':
+                    self.tokenizer.selectNext()
+                    num = self.tokenizer.next.value
+                    if isinstance(num, int):
+                        result += num
+                    else:
+                        raise SyntaxError("Erro: Caractere inválido")
+                if self.tokenizer.next.value == '-':
+                    self.tokenizer.selectNext()
+                    num = self.tokenizer.next.value
+                    if isinstance(num, int):
+                        result -= num
+                    else:
+                        raise SyntaxError("Erro: Caractere inválido")
+                self.tokenizer.selectNext()
+            return result
+        else:
+            raise SyntaxError("Erro: Caractere inválido")
+            
 
+
+    def run(self, code):
+        Parser.tokenizer = Tokenizer(code)
+        return self.parseExpression()
 if __name__ == "__main__":
-    soma(sys.argv[1])
+    p = Parser()
+    teste = p.run(sys.argv[1])
+    print(teste)
+    
+
+
+
+
