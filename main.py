@@ -31,8 +31,6 @@ class Tokenizer:
                 self.next = Token('MINUS', '-') 
                 self.position += 1
                 
-            elif current_char == " ":
-                self.position += 1
 
             else:
                 raise SyntaxError("Erro: Caractere inválido")
@@ -44,17 +42,21 @@ class Tokenizer:
 class Parser:
     tokenizer = None
     def parseExpression(self):
+        flag_num = 0
         num = 0
         result = self.tokenizer.selectNext()
-        if self.tokenizer.next.t_type == 'INT':
+        if self.tokenizer.next.t_type == 'INT' and flag_num == 0:
             result = self.tokenizer.next.value
+            #print(result)
             self.tokenizer.selectNext()
+            flag_num = 1
             while self.tokenizer.next.t_type == 'PLUS' or self.tokenizer.next.t_type == 'MINUS':
                 if self.tokenizer.next.value == '+':
                     self.tokenizer.selectNext()
                     num = self.tokenizer.next.value
                     if isinstance(num, int):
                         result += num
+                        flag_num = 0
                     else:
                         raise SyntaxError("Erro: Caractere inválido")
                 if self.tokenizer.next.value == '-':
@@ -62,9 +64,12 @@ class Parser:
                     num = self.tokenizer.next.value
                     if isinstance(num, int):
                         result -= num
+                        flag_num = 0
                     else:
                         raise SyntaxError("Erro: Caractere inválido")
                 self.tokenizer.selectNext()
+            if flag_num == 1:
+                raise SyntaxError("Erro: Caractere inválido")
             return result
         else:
             raise SyntaxError("Erro: Caractere inválido")
