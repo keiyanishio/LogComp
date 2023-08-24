@@ -1,2 +1,6 @@
 # Compilador LogComp
 ![git status](http://3.129.230.99/svg/keiyanishio/LogComp/)
+
+
+## Roteiro 1
+![DS roteiro1](imgs/roteiro.png)
