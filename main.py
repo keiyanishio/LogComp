@@ -13,6 +13,9 @@ class Tokenizer:
     
     
     def selectNext(self):
+        #print(len(self.source))
+        if len(self.source) <= 2:
+            raise SyntaxError("Erro: Caractere inválido")
         if self.position < len(self.source):
             current_char = self.source[self.position]
 
@@ -94,8 +97,8 @@ class Parser:
                     else:
                         raise SyntaxError("Erro: Caractere inválido")
                 self.tokenizer.selectNext()
-            if self.tokenizer.next.t_type == 'EOF':
-                raise SyntaxError("Erro: Caractere inválido")
+            #if flag_num == 1:
+            #    raise SyntaxError("Erro: Caractere inválido")
             return result
         else:
             raise SyntaxError("Erro: Caractere inválido")
@@ -112,3 +115,4 @@ if __name__ == "__main__":
     p = Parser()
     teste = p.run(sys.argv[1])
     print(teste)
+    
