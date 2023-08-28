@@ -3,4 +3,4 @@
 
 
 ## Roteiro 1
-![DS roteiro1](imgs/roteiro.png)
+![DS roteiro1](imgs/roteiro1.png)
