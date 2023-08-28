@@ -75,7 +75,7 @@ class Parser:
             result = self.tokenizer.next.value
             #print(result)
             self.tokenizer.selectNext()
-            #flag_num = 1
+            flag_num = 1
             while self.tokenizer.next.t_type == 'MULTI' or self.tokenizer.next.t_type == 'DIV':
                 if self.tokenizer.next.value == '*':
                     self.tokenizer.selectNext()
@@ -94,8 +94,8 @@ class Parser:
                     else:
                         raise SyntaxError("Erro: Caractere inválido")
                 self.tokenizer.selectNext()
-            #if flag_num == 1:
-            #    raise SyntaxError("Erro: Caractere inválido")
+            if flag_num == 1:
+                raise SyntaxError("Erro: Caractere inválido")
             return result
         else:
             raise SyntaxError("Erro: Caractere inválido")
