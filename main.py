@@ -22,6 +22,14 @@ class Tokenizer:
                     value += self.source[self.position]
                     self.position += 1
                 self.next = Token('INT', int(value))
+                
+            elif current_char == "*":
+                self.next = Token('MULTI', '*')
+                self.position += 1
+
+            elif current_char == "/":
+                self.next = Token('DIV', '/') 
+                self.position += 1
 
             elif current_char == "+":
                 self.next = Token('PLUS', '+')
@@ -41,44 +49,65 @@ class Tokenizer:
         
 class Parser:
     tokenizer = None
-    def parseExpression(self):
+    
+    def parser_expression(self):
+        result = self.parser_term()
+        #print(result)
+        #self.tokenizer.selectNext()
+        while self.tokenizer.next.t_type == 'PLUS' or self.tokenizer.next.t_type == 'MINUS':
+            op = self.tokenizer.next
+            self.tokenizer.selectNext()
+            num = self.parser_term()
+            if op.t_type == 'PLUS':
+                result += num
+            elif op.t_type == 'MINUS':
+                result -= num
+                   
+        return result
+    
+    
+    
+    def parser_term(self):
         flag_num = 0
         num = 0
-        result = self.tokenizer.selectNext()
-        if self.tokenizer.next.t_type == 'INT' and flag_num == 0:
+        #result = self.tokenizer.selectNext()
+        if (self.tokenizer.next.t_type == 'INT' and flag_num == 0):
             result = self.tokenizer.next.value
             #print(result)
             self.tokenizer.selectNext()
-            flag_num = 1
-            while self.tokenizer.next.t_type == 'PLUS' or self.tokenizer.next.t_type == 'MINUS':
-                if self.tokenizer.next.value == '+':
+            #flag_num = 1
+            while self.tokenizer.next.t_type == 'MULTI' or self.tokenizer.next.t_type == 'DIV':
+                if self.tokenizer.next.value == '*':
                     self.tokenizer.selectNext()
                     num = self.tokenizer.next.value
                     if isinstance(num, int):
-                        result += num
+                        result *= num
                         flag_num = 0
                     else:
                         raise SyntaxError("Erro: Caractere inválido")
-                if self.tokenizer.next.value == '-':
+                if self.tokenizer.next.value == '/':
                     self.tokenizer.selectNext()
                     num = self.tokenizer.next.value
                     if isinstance(num, int):
-                        result -= num
+                        result //= num
                         flag_num = 0
                     else:
                         raise SyntaxError("Erro: Caractere inválido")
                 self.tokenizer.selectNext()
-            if flag_num == 1:
-                raise SyntaxError("Erro: Caractere inválido")
+            #if flag_num == 1:
+            #    raise SyntaxError("Erro: Caractere inválido")
             return result
         else:
             raise SyntaxError("Erro: Caractere inválido")
+        
+    
             
 
 
     def run(self, code):
         Parser.tokenizer = Tokenizer(code)
-        return self.parseExpression()
+        Parser.tokenizer.selectNext()
+        return self.parser_expression()
 if __name__ == "__main__":
     p = Parser()
     teste = p.run(sys.argv[1])
