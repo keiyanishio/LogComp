@@ -95,6 +95,9 @@ class Parser:
                         raise SyntaxError("Erro: Caractere inválido")
                 self.tokenizer.selectNext()
             if flag_num == 1:
+                self.tokenizer.selectNext()
+                if self.tokenizer.next.value == '':
+                    raise SyntaxError("Erro: Caractere inválido")
                 raise SyntaxError("Erro: Caractere inválido")
             return result
         else:
