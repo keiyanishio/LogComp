@@ -8,3 +8,5 @@
 ## Roteiro 2
 ![DS roteiro2](imgs/roteiro2.png)
 
+## Roteiro 3
+![DS roteiro3](imgs/roteiro3.png)
