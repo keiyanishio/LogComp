@@ -71,17 +71,12 @@ class Parser:
             return result
             
         elif self.tokenizer.next.t_type == 'PLUS':
-            # result = self.factor()
-            # self.tokenizer.selectNext()
             return +self.factor()
         
         elif self.tokenizer.next.t_type == 'MINUS':
-            # result = self.factor()
-            # self.tokenizer.selectNext()
             return -self.factor()
         
         elif self.tokenizer.next.t_type == 'OPEN':
-            #self.tokenizer.selectNext()
             result = self.parser_expression()
             if self.tokenizer.next.t_type == 'CLOSE':
                 self.tokenizer.selectNext()
@@ -99,7 +94,6 @@ class Parser:
         #print(result)
         while self.tokenizer.next.t_type == 'PLUS' or self.tokenizer.next.t_type == 'MINUS':
             op = self.tokenizer.next
-            #self.tokenizer.selectNext()
             num = self.parser_term()
             if op.t_type == 'PLUS':
                 result += num
@@ -115,7 +109,6 @@ class Parser:
         #print(result)
         while self.tokenizer.next.t_type == 'MULTI' or self.tokenizer.next.t_type == 'DIV':
             op = self.tokenizer.next
-            #self.tokenizer.selectNext()
             num = self.factor()
             if op.t_type == 'MULTI':
                 result *= num
@@ -129,7 +122,6 @@ class Parser:
 
     def run(self, code):
         Parser.tokenizer = Tokenizer(code)
-        #Parser.tokenizer.selectNext()
         result = self.parser_expression()
         if self.tokenizer.next.t_type != 'EOF':
             raise SyntaxError("EOFFFFFFF")
