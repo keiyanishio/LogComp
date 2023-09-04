@@ -63,19 +63,25 @@ class Parser:
     tokenizer = None
     
     def factor(self):
-        #num = 0
+        self.tokenizer.selectNext()
+        
         if self.tokenizer.next.t_type == 'INT':
             result = self.tokenizer.next.value
             self.tokenizer.selectNext()
             return result
             
-        elif (self.tokenizer.next.t_type == 'PLUS' or self.tokenizer.next.t_type == 'MINUS'):
-            result = self.factor()
-            self.tokenizer.selectNext()
-            return result
+        elif self.tokenizer.next.t_type == 'PLUS':
+            # result = self.factor()
+            # self.tokenizer.selectNext()
+            return +self.factor()
+        
+        elif self.tokenizer.next.t_type == 'MINUS':
+            # result = self.factor()
+            # self.tokenizer.selectNext()
+            return -self.factor()
         
         elif self.tokenizer.next.t_type == 'OPEN':
-            self.tokenizer.selectNext()
+            #self.tokenizer.selectNext()
             result = self.parser_expression()
             if self.tokenizer.next.t_type == 'CLOSE':
                 self.tokenizer.selectNext()
@@ -85,26 +91,6 @@ class Parser:
         else:
             raise SyntaxError("Erro: Caractere inválido")
             
-            
-        #     while self.tokenizer.next.t_type == 'MULTI' or self.tokenizer.next.t_type == 'DIV':
-        #         if self.tokenizer.next.value == '*':
-        #             self.tokenizer.selectNext()
-        #             num = self.tokenizer.next.value
-        #             if isinstance(num, int):
-        #                 result *= num
-        #             else:
-        #                 raise SyntaxError("Erro: Caractere inválido")
-        #         if self.tokenizer.next.value == '/':
-        #             self.tokenizer.selectNext()
-        #             num = self.tokenizer.next.value
-        #             if isinstance(num, int):
-        #                 result //= num
-        #             else:
-        #                 raise SyntaxError("Erro: Caractere inválido")
-        #         self.tokenizer.selectNext()
-        #     return result
-        # else:
-        #     raise SyntaxError("Erro: Caractere inválido")
         
         
     
@@ -113,7 +99,7 @@ class Parser:
         #print(result)
         while self.tokenizer.next.t_type == 'PLUS' or self.tokenizer.next.t_type == 'MINUS':
             op = self.tokenizer.next
-            self.tokenizer.selectNext()
+            #self.tokenizer.selectNext()
             num = self.parser_term()
             if op.t_type == 'PLUS':
                 result += num
@@ -129,7 +115,7 @@ class Parser:
         #print(result)
         while self.tokenizer.next.t_type == 'MULTI' or self.tokenizer.next.t_type == 'DIV':
             op = self.tokenizer.next
-            self.tokenizer.selectNext()
+            #self.tokenizer.selectNext()
             num = self.factor()
             if op.t_type == 'MULTI':
                 result *= num
@@ -137,42 +123,17 @@ class Parser:
                 result //= num
                    
         return result
-    
-    
-        # num = 0
-        # if (self.tokenizer.next.t_type == 'INT' and flag_num == 0):
-        #     result = self.tokenizer.next.value
-        #     self.tokenizer.selectNext()
-        #     while self.tokenizer.next.t_type == 'MULTI' or self.tokenizer.next.t_type == 'DIV':
-        #         if self.tokenizer.next.value == '*':
-        #             self.tokenizer.selectNext()
-        #             num = self.tokenizer.next.value
-        #             if isinstance(num, int):
-        #                 result *= num
-        #                 flag_num = 0
-        #             else:
-        #                 raise SyntaxError("Erro: Caractere inválido")
-        #         if self.tokenizer.next.value == '/':
-        #             self.tokenizer.selectNext()
-        #             num = self.tokenizer.next.value
-        #             if isinstance(num, int):
-        #                 result //= num
-        #                 flag_num = 0
-        #             else:
-        #                 raise SyntaxError("Erro: Caractere inválido")
-        #         self.tokenizer.selectNext()
-        #     return result
-        # else:
-        #     raise SyntaxError("Erro: Caractere inválido")
         
-    
             
 
 
     def run(self, code):
         Parser.tokenizer = Tokenizer(code)
-        Parser.tokenizer.selectNext()
-        return self.parser_expression()
+        #Parser.tokenizer.selectNext()
+        result = self.parser_expression()
+        if self.tokenizer.next.t_type != 'EOF':
+            raise SyntaxError("EOFFFFFFF")
+        return result
     
     
 if __name__ == "__main__":
