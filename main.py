@@ -11,7 +11,7 @@ class PrePro:
     def filter(source):
         i = 0 
         while i < len(source):
-            if source[i] == "//":
+            if source[i] == "/" and source[i+1] == "/":
                 break
             i += 1
         return source[:i]
@@ -117,16 +117,16 @@ class Parser:
         self.tokenizer.selectNext()
         
         if self.tokenizer.next.t_type == 'INT':
-            # result = self.tokenizer.next.value
-            # self.tokenizer.selectNext()
-            result = IntVal(Parser.tokenizer.next.value, [])
+            result = self.tokenizer.next.value
+            self.tokenizer.selectNext()
+            result = IntVal(result, [])
             return result
             
         elif self.tokenizer.next.t_type == 'PLUS':
-            return UnOp("+", self.factor())
+            return UnOp("+", [self.factor()])
         
         elif self.tokenizer.next.t_type == 'MINUS':
-            return UnOp("-", self.factor())
+            return UnOp("-", [self.factor()])
         
         elif self.tokenizer.next.t_type == 'OPEN':
             result = self.parser_expression()
@@ -146,11 +146,11 @@ class Parser:
         #print(result)
         while self.tokenizer.next.t_type == 'PLUS' or self.tokenizer.next.t_type == 'MINUS':
             op = self.tokenizer.next
-            #num = self.parser_term()
+            num = self.parser_term()
             if op.t_type == 'PLUS':
-                result = BinOp("+", (self.factor(), result))
+                result = BinOp(op, [result, num])
             elif op.t_type == 'MINUS':
-                result = BinOp("-", (self.factor(), result))
+                result = BinOp(op, [result, num])
                    
         return result
     
@@ -161,11 +161,11 @@ class Parser:
         #print(result)
         while self.tokenizer.next.t_type == 'MULTI' or self.tokenizer.next.t_type == 'DIV':
             op = self.tokenizer.next
-            #num = self.factor()
+            num = self.factor()
             if op.t_type == 'MULTI':
-                result = BinOp("*", (self.factor(), result))
+                result = BinOp(op, [result, num])
             elif op.t_type == 'DIV':
-                result = BinOp("/", (self.factor(), result))
+                result = BinOp(op, [result, num])
                    
         return result
         
@@ -180,6 +180,11 @@ class Parser:
             raise SyntaxError("EOFFFFFFF")
         return result
     
+    
+# if __name__ == "__main__":
+#     p = Parser()
+#     teste = p.run(sys.argv[1])
+#     print(teste)
     
 if __name__ == "__main__":
     p = Parser()
