@@ -1,9 +1,22 @@
 import sys
 
+
 class Token:
     def __init__(self, t_type: str, value):
         self.t_type = t_type
         self.value = value
+
+class PrePro:
+    @staticmethod
+    def filter(source):
+        i = 0 
+        while i < len(source):
+            if source[i] == "//":
+                break
+            i += 1
+        return source[:i]
+            
+        
 
 class Tokenizer:
     def __init__(self, source):
@@ -57,6 +70,44 @@ class Tokenizer:
 
         else:
             self.next = Token('EOF', '')
+
+class Node:
+    def __init__(self, value, children):
+        self.value = value 
+        self.children = children
+        
+
+    def evaluate(self):
+        pass
+    
+class BinOp(Node):
+    def evaluate(self):
+        if self.value == "+":
+            return self.children[0].evaluate() + self.children[1].evaluate()
+        
+        elif self.value == "-":
+            return self.children[0].evaluate() - self.children[1].evaluate()
+        
+        elif self.value == "*":
+            return self.children[0].evaluate() * self.children[1].evaluate()
+        
+        elif self.value == "/":
+            return self.children[0].evaluate() // self.children[1].evaluate()
+
+class UnOp(Node):
+    def evaluate(self):
+        if self.value == "+":
+            return self.children[0].evaluate()
+        else:
+            return -self.children[0].evaluate()
+        
+class IntVal(Node):
+    def evaluate(self):
+        return self.value
+
+class NoOp(Node):
+    def evaluate(self):
+        return None
         
         
 class Parser:
@@ -66,15 +117,16 @@ class Parser:
         self.tokenizer.selectNext()
         
         if self.tokenizer.next.t_type == 'INT':
-            result = self.tokenizer.next.value
-            self.tokenizer.selectNext()
+            # result = self.tokenizer.next.value
+            # self.tokenizer.selectNext()
+            result = IntVal(Parser.tokenizer.next.value, [])
             return result
             
         elif self.tokenizer.next.t_type == 'PLUS':
-            return +self.factor()
+            return UnOp("+", self.factor())
         
         elif self.tokenizer.next.t_type == 'MINUS':
-            return -self.factor()
+            return UnOp("-", self.factor())
         
         elif self.tokenizer.next.t_type == 'OPEN':
             result = self.parser_expression()
@@ -94,11 +146,11 @@ class Parser:
         #print(result)
         while self.tokenizer.next.t_type == 'PLUS' or self.tokenizer.next.t_type == 'MINUS':
             op = self.tokenizer.next
-            num = self.parser_term()
+            #num = self.parser_term()
             if op.t_type == 'PLUS':
-                result += num
+                result = BinOp("+", (self.factor(), result))
             elif op.t_type == 'MINUS':
-                result -= num
+                result = BinOp("-", (self.factor(), result))
                    
         return result
     
@@ -109,11 +161,11 @@ class Parser:
         #print(result)
         while self.tokenizer.next.t_type == 'MULTI' or self.tokenizer.next.t_type == 'DIV':
             op = self.tokenizer.next
-            num = self.factor()
+            #num = self.factor()
             if op.t_type == 'MULTI':
-                result *= num
+                result = BinOp("*", (self.factor(), result))
             elif op.t_type == 'DIV':
-                result //= num
+                result = BinOp("/", (self.factor(), result))
                    
         return result
         
@@ -121,7 +173,8 @@ class Parser:
 
 
     def run(self, code):
-        Parser.tokenizer = Tokenizer(code)
+        pre_processo = PrePro.filter(code)
+        Parser.tokenizer = Tokenizer(pre_processo)
         result = self.parser_expression()
         if self.tokenizer.next.t_type != 'EOF':
             raise SyntaxError("EOFFFFFFF")
@@ -131,5 +184,8 @@ class Parser:
 if __name__ == "__main__":
     p = Parser()
     teste = p.run(sys.argv[1])
-    print(teste)
-    
+    with open(teste, 'r') as f:
+        expression = f.readline()
+    f.close()
+    b = p.run(expression)
+    print(b.Evaluate())
