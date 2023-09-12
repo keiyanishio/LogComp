@@ -11,7 +11,7 @@ class PrePro:
     def filter(source):
         i = 0 
         while i < len(source):
-            if source[i] == "/" and source[i+1] == "/":
+            if source[i:i+2] == "//":
                 break
             i += 1
         return source[:i]
@@ -19,6 +19,7 @@ class PrePro:
         
 
 class Tokenizer:
+
     def __init__(self, source):
         self.source = source.replace(" ", "").strip()
         self.position = 0
@@ -26,9 +27,9 @@ class Tokenizer:
     
     
     def selectNext(self):
-        #print(len(self.source))
-        if len(self.source) <= 2:
-            raise SyntaxError("Erro: Caractere inválido")
+        #print((self.source))
+        # if len(self.source) <= 2:
+        #     raise SyntaxError("Erro: Caractere inválido")
         if self.position < len(self.source):
             current_char = self.source[self.position]
 
@@ -78,7 +79,7 @@ class Node:
         
 
     def evaluate(self):
-        pass
+        None
     
 class BinOp(Node):
     def evaluate(self):
@@ -109,7 +110,8 @@ class NoOp(Node):
     def evaluate(self):
         return None
         
-        
+
+
 class Parser:
     tokenizer = None
     
@@ -119,8 +121,8 @@ class Parser:
         if self.tokenizer.next.t_type == 'INT':
             result = self.tokenizer.next.value
             self.tokenizer.selectNext()
-            result = IntVal(result, [])
-            return result
+            res = IntVal(result, [])
+            return res
             
         elif self.tokenizer.next.t_type == 'PLUS':
             return UnOp("+", [self.factor()])
@@ -148,9 +150,9 @@ class Parser:
             op = self.tokenizer.next
             num = self.parser_term()
             if op.t_type == 'PLUS':
-                result = BinOp(op, [result, num])
+                result = BinOp(op.value, [result, num])
             elif op.t_type == 'MINUS':
-                result = BinOp(op, [result, num])
+                result = BinOp(op.value, [result, num])
                    
         return result
     
@@ -163,9 +165,9 @@ class Parser:
             op = self.tokenizer.next
             num = self.factor()
             if op.t_type == 'MULTI':
-                result = BinOp(op, [result, num])
+                result = BinOp(op.value, [result, num])
             elif op.t_type == 'DIV':
-                result = BinOp(op, [result, num])
+                result = BinOp(op.value, [result, num])
                    
         return result
         
@@ -179,18 +181,22 @@ class Parser:
         if self.tokenizer.next.t_type != 'EOF':
             raise SyntaxError("EOFFFFFFF")
         return result
-    
-    
-# if __name__ == "__main__":
-#     p = Parser()
-#     teste = p.run(sys.argv[1])
-#     print(teste)
+
+
     
 if __name__ == "__main__":
     p = Parser()
-    teste = p.run(sys.argv[1])
-    with open(teste, 'r') as f:
-        expression = f.readline()
-    f.close()
-    b = p.run(expression)
-    print(b.Evaluate())
+    file = sys.argv[1]
+    with open(file, 'r') as arquivo:
+        conteudo = arquivo.read()
+    arquivo.close()
+    
+    #print("Input Content:")
+    #print(conteudo)
+    teste = p.run(conteudo)
+    result = teste.evaluate()
+    print(result)
+    
+    
+    
+
