@@ -28,8 +28,8 @@ class Tokenizer:
     
     def selectNext(self):
         #print((self.source))
-        # if len(self.source) <= 2:
-        #     raise SyntaxError("Erro: Caractere inválido")
+        if len(self.source) <= 2:
+            raise SyntaxError("Erro: Caractere inválido")
         if self.position < len(self.source):
             current_char = self.source[self.position]
 
