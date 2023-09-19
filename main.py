@@ -14,14 +14,14 @@ class PrePro:
             if source[i:i+2] == "//":
                 break
             i += 1
-        return source[:i]
+        return source[:i].replace(" ", "").strip()
             
         
 
 class Tokenizer:
 
     def __init__(self, source):
-        self.source = source.replace(" ", "").strip()
+        self.source = source
         self.position = 0
         self.next = None
     
@@ -64,13 +64,45 @@ class Tokenizer:
                 self.next = Token('CLOSE', ')') 
                 self.position += 1
                 
+            elif current_char == "=":
+                self.next = Token('EQUAL', '=') 
+                self.position += 1
+            
+            elif current_char.isalpha():
+                identifier = ""
+                while self.position < len(self.source) and self.source[self.position].isalnum():
+                    identifier += self.source[self.position]
+                    self.position += 1
+
+                if identifier == "Println":
+                    self.next = Token('PRINTLN', 'Println')
+                else:
+                    self.next = Token('IDENTIFIER', identifier)
+                    
+            elif current_char == '\n':
+                self.next = Token('NEWLINE', '\n')
+                self.position += 1
                 
 
             else:
                 raise SyntaxError("Erro: Caractere inválido")
 
         else:
-            self.next = Token('EOF', '')
+            self.next = Token('EOF', 'EOF')
+            
+            
+class SymbolTable:
+    def __init__(self):
+        self.table = {}
+
+    def setter(self, key, value):
+        self.table[key] = value
+        
+    def getter(self, key):
+        return self.table[key]
+    
+
+    
 
 class Node:
     def __init__(self, value, children):
@@ -78,59 +110,153 @@ class Node:
         self.children = children
         
 
-    def evaluate(self):
-        None
+    def evaluate(self, ST):
+        pass
     
 class BinOp(Node):
-    def evaluate(self):
+    def evaluate(self, ST):
         if self.value == "+":
-            return self.children[0].evaluate() + self.children[1].evaluate()
+            return self.children[0].evaluate(ST) + self.children[1].evaluate(ST)
         
         elif self.value == "-":
-            return self.children[0].evaluate() - self.children[1].evaluate()
+            return self.children[0].evaluate(ST) - self.children[1].evaluate(ST)
         
         elif self.value == "*":
-            return self.children[0].evaluate() * self.children[1].evaluate()
+            return self.children[0].evaluate(ST) * self.children[1].evaluate(ST)
         
         elif self.value == "/":
-            return self.children[0].evaluate() // self.children[1].evaluate()
+            return self.children[0].evaluate(ST) // self.children[1].evaluate(ST)
 
 class UnOp(Node):
-    def evaluate(self):
+    def evaluate(self, ST):
         if self.value == "+":
-            return self.children[0].evaluate()
+            return self.children[0].evaluate(ST)
         else:
-            return -self.children[0].evaluate()
+            return -self.children[0].evaluate(ST)
         
 class IntVal(Node):
-    def evaluate(self):
+    def evaluate(self, ST):
         return self.value
 
 class NoOp(Node):
-    def evaluate(self):
-        return None
-        
+    def evaluate(self, ST):
+        pass
+    
+#####################################
+class Assigment(Node):
+    def evaluate(self, ST):
+        return ST.setter(self.children[0].value, self.children[1].evaluate(ST))
+    
+    
+class Identifier(Node):
+    def evaluate(self, ST):
+        return ST.getter(self.value)
+            
+
+class Block(Node):
+    def evaluate(self, ST):
+        for child in self.children:
+            child.evaluate(ST)
+            
+class Print(Node):
+    def evaluate(self, ST):
+        print(self.children[0].evaluate(ST))
+        #print("Debug")
+        return 0
+
+
+
+
 
 
 class Parser:
     tokenizer = None
     
-    def factor(self):
-        self.tokenizer.selectNext()
+    def block(self):
+        children = []
+        #self.tokenizer.selectNext()
+        while self.tokenizer.next.t_type != 'EOF':
+            children.append(self.statement())
+            #self.tokenizer.selectNext()
+        return Block(None, children)
+    
+    def statement(self):
+        if self.tokenizer.next.t_type == 'IDENTIFIER':
+            identi = Identifier(self.tokenizer.next.value, [])
+            self.tokenizer.selectNext()
+            if self.tokenizer.next.t_type == 'EQUAL':
+                self.tokenizer.selectNext()
+                result = Assigment(None, [identi, self.parser_expression()])
+                #print(self.tokenizer.next.value)
+                if self.tokenizer.next.t_type == 'NEWLINE':
+                    self.tokenizer.selectNext()
+                    return result
+                elif self.tokenizer.next.t_type == 'EOF':
+                    return result
+                else:
+                    #print(repr(self.tokenizer.next.value))
+                    raise SyntaxError("Erro: NEWLINE IDENTIFIER")
+            else:
+                raise SyntaxError("Erro: EQUAL")
+
+        elif self.tokenizer.next.t_type == 'PRINTLN':
+            self.tokenizer.selectNext()
+            if self.tokenizer.next.t_type == 'OPEN':
+                self.tokenizer.selectNext()
+                #print(self.tokenizer.next.value)
+                result = self.parser_expression()
+                #print(result.value)
+                if self.tokenizer.next.t_type == 'CLOSE':
+                    self.tokenizer.selectNext()
+                    final = Print(None, [result]) 
+                    if self.tokenizer.next.t_type == 'NEWLINE':
+                        self.tokenizer.selectNext()
+                        return final
+                    elif self.tokenizer.next.t_type == 'EOF':
+                        return final
+                    else:
+                        raise SyntaxError("Erro: NEWLINE PRINTLN")
+                else:
+                    raise SyntaxError("Erro: CLOSE")
+            else:
+                raise SyntaxError("Erro: OPEN")
+
+        elif self.tokenizer.next.t_type == 'NEWLINE' or self.tokenizer.next.t_type == 'EOF':
+            result = NoOp(None, None)
+            return result
+
+    
+        return NoOp(None, None)
+                    
         
+                
+        
+    
+    def factor(self):
+        
+        #self.tokenizer.next.t_type
         if self.tokenizer.next.t_type == 'INT':
             result = self.tokenizer.next.value
             self.tokenizer.selectNext()
             res = IntVal(result, [])
             return res
-            
+        
+        elif self.tokenizer.next.t_type == "IDENTIFIER":
+            result = self.tokenizer.next.value
+            identi = Identifier(result, [])
+            self.tokenizer.selectNext()
+            return identi
+        
         elif self.tokenizer.next.t_type == 'PLUS':
+            self.tokenizer.selectNext()
             return UnOp("+", [self.factor()])
         
         elif self.tokenizer.next.t_type == 'MINUS':
+            self.tokenizer.selectNext()
             return UnOp("-", [self.factor()])
         
         elif self.tokenizer.next.t_type == 'OPEN':
+            self.tokenizer.selectNext()
             result = self.parser_expression()
             if self.tokenizer.next.t_type == 'CLOSE':
                 self.tokenizer.selectNext()
@@ -145,14 +271,15 @@ class Parser:
     
     def parser_expression(self):
         result = self.parser_term()
-        #print(result)
+        #print(result.value)
         while self.tokenizer.next.t_type == 'PLUS' or self.tokenizer.next.t_type == 'MINUS':
             op = self.tokenizer.next
-            num = self.parser_term()
             if op.t_type == 'PLUS':
-                result = BinOp(op.value, [result, num])
+                self.tokenizer.selectNext()
+                result = BinOp(op.value, [result, self.parser_term()])
             elif op.t_type == 'MINUS':
-                result = BinOp(op.value, [result, num])
+                self.tokenizer.selectNext()
+                result = BinOp(op.value, [result, self.parser_term()])
                    
         return result
     
@@ -163,11 +290,13 @@ class Parser:
         #print(result)
         while self.tokenizer.next.t_type == 'MULTI' or self.tokenizer.next.t_type == 'DIV':
             op = self.tokenizer.next
-            num = self.factor()
+            
             if op.t_type == 'MULTI':
-                result = BinOp(op.value, [result, num])
+                self.tokenizer.selectNext()
+                result = BinOp(op.value, [result, self.factor()])
             elif op.t_type == 'DIV':
-                result = BinOp(op.value, [result, num])
+                self.tokenizer.selectNext()
+                result = BinOp(op.value, [result, self.factor()])
                    
         return result
         
@@ -177,7 +306,8 @@ class Parser:
     def run(self, code):
         pre_processo = PrePro.filter(code)
         Parser.tokenizer = Tokenizer(pre_processo)
-        result = self.parser_expression()
+        self.tokenizer.selectNext()
+        result = self.block()
         if self.tokenizer.next.t_type != 'EOF':
             raise SyntaxError("EOFFFFFFF")
         return result
@@ -185,6 +315,7 @@ class Parser:
 
     
 if __name__ == "__main__":
+    ST = SymbolTable()
     p = Parser()
     file = sys.argv[1]
     with open(file, 'r') as arquivo:
@@ -192,10 +323,12 @@ if __name__ == "__main__":
     arquivo.close()
     
     #print("Input Content:")
-    #print(conteudo)
+    #print(repr(conteudo))
+    
     teste = p.run(conteudo)
-    result = teste.evaluate()
-    print(result)
+    teste.evaluate(ST)
+    #print(ST.table)
+    
     
     
     
