@@ -25,7 +25,7 @@ class Tokenizer:
         self.source = source
         self.position = 0
         self.next = None
-        self.identifier_pattern = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_]*$')
+        
     
     
     def selectNext(self):
@@ -244,9 +244,11 @@ class Parser:
         elif self.tokenizer.next.t_type == 'NEWLINE' or self.tokenizer.next.t_type == 'EOF':
             result = NoOp(None, None)
             return result
+        else:
+            raise SyntaxError("Erro: ERRO")
 
     
-        return NoOp(None, None)
+        #return NoOp(None, None)
                     
         
                 
