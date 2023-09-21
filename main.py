@@ -9,20 +9,15 @@ class Token:
 class PrePro:
     @staticmethod
     def filter(source):
-        lines = source.split('\n')
-        filtered_lines = []
+        source = re.sub(r'\/\/[^\n]*', '', source) 
+        source = re.sub(r'\/\*.*?\*\/', '', source, flags=re.DOTALL)  
 
-        for line in lines:
-            if '//' in line:
-                filtered_line = line.split('//')[0]
-            else:
-                filtered_line = line
-            filtered_lines.append(filtered_line)
-            
-        filtered_source = '\n'.join(filtered_lines)
+        lines = source.split('\n')
+        non_empty_lines = [line for line in lines if line.strip() != '']
+        
+        filtered_source = '\n'.join(non_empty_lines)
 
         return filtered_source.strip()
-        
 
 class Tokenizer:
 
@@ -35,9 +30,8 @@ class Tokenizer:
     
     def selectNext(self):
         #print((self.source))
-        
-        if len(self.source) <= 2:
-            raise SyntaxError("Erro: Caractere inválido")
+    
+
         if self.position < len(self.source):
             current_char = self.source[self.position]
         
@@ -197,6 +191,7 @@ class Parser:
     def block(self):
         children = []
         #self.tokenizer.selectNext()
+        
         while self.tokenizer.next.t_type != 'EOF':
             children.append(self.statement())
             #self.tokenizer.selectNext()
