@@ -1,5 +1,5 @@
 import sys
-
+import re 
 
 class Token:
     def __init__(self, t_type: str, value):
@@ -9,13 +9,19 @@ class Token:
 class PrePro:
     @staticmethod
     def filter(source):
-        i = 0 
-        while i < len(source):
-            if source[i:i+2] == "//":
-                break
-            i += 1
-        return source[:i].replace(" ", "").strip()
+        lines = source.split('\n')
+        filtered_lines = []
+
+        for line in lines:
+            if '//' in line:
+                filtered_line = line.split('//')[0]
+            else:
+                filtered_line = line
+            filtered_lines.append(filtered_line)
             
+        filtered_source = '\n'.join(filtered_lines)
+
+        return filtered_source.strip()
         
 
 class Tokenizer:
@@ -24,16 +30,41 @@ class Tokenizer:
         self.source = source
         self.position = 0
         self.next = None
+        self.identifier_pattern = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_]*$')
     
     
     def selectNext(self):
         #print((self.source))
+        
         if len(self.source) <= 2:
             raise SyntaxError("Erro: Caractere inválido")
         if self.position < len(self.source):
             current_char = self.source[self.position]
+        
+            #print(current_char)
+            
+            if current_char == '\n':
+                self.next = Token('NEWLINE', '\n')
+                self.position += 1
+                
+            elif current_char.isspace():
+                self.position += 1
+                self.selectNext()
+                
+            elif current_char.isalpha() or current_char == "_":
+                identifier = ""
+                while self.position < len(self.source) and (current_char.isalnum() or current_char == "_"):
+                    identifier += current_char
+                    self.position += 1
+                    if self.position < len(self.source):
+                        current_char = self.source[self.position]
 
-            if current_char.isdigit():
+                if identifier == "Println":
+                    self.next = Token('PRINTLN', 'Println')
+                else:
+                    self.next = Token('IDENTIFIER', identifier)
+
+            elif current_char.isdigit():
                 value = ""
                 while self.position < len(self.source) and self.source[self.position].isdigit():
                     value += self.source[self.position]
@@ -68,20 +99,9 @@ class Tokenizer:
                 self.next = Token('EQUAL', '=') 
                 self.position += 1
             
-            elif current_char.isalpha():
-                identifier = ""
-                while self.position < len(self.source) and self.source[self.position].isalnum():
-                    identifier += self.source[self.position]
-                    self.position += 1
-
-                if identifier == "Println":
-                    self.next = Token('PRINTLN', 'Println')
-                else:
-                    self.next = Token('IDENTIFIER', identifier)
+            
                     
-            elif current_char == '\n':
-                self.next = Token('NEWLINE', '\n')
-                self.position += 1
+            
                 
 
             else:
@@ -89,6 +109,8 @@ class Tokenizer:
 
         else:
             self.next = Token('EOF', 'EOF')
+            
+    
             
             
 class SymbolTable:
@@ -324,7 +346,6 @@ if __name__ == "__main__":
     
     #print("Input Content:")
     #print(repr(conteudo))
-    
     teste = p.run(conteudo)
     teste.evaluate(ST)
     #print(ST.table)
