@@ -39,6 +39,16 @@ class Tokenizer:
 
                 if identifier == "Println":
                     self.next = Token('PRINTLN', 'Println')
+                    
+                elif identifier == "Scanln":
+                    self.next = Token('SCANLN', 'Scanln')
+                    
+                elif identifier == "if":
+                    self.next = Token('IF', 'if')
+                    
+                elif identifier == "else":
+                    self.next = Token('ELSE', 'else')
+    
                 else:
                     self.next = Token('IDENTIFIER', identifier)
 
@@ -77,8 +87,45 @@ class Tokenizer:
                 self.position += 1
                 
             elif current_char == "=":
-                self.next = Token('EQUAL', '=') 
+                if self.source[self.position+1] == "=":
+                    self.next = Token('EQUALCON', '==')
+                    self.position += 2
+                else:
+                    self.next = Token('EQUAL', '=') 
+                    self.position += 1
+                
+            elif current_char == ">":
+                self.next = Token('GT', '>') 
                 self.position += 1
+                
+            elif current_char == "<":
+                self.next = Token('LT', '<') 
+                self.position += 1
+                
+            elif current_char == "|":
+                self.next = Token('OR', '||') 
+                self.position += 2
+                
+            elif current_char == "&":
+                self.next = Token('AND', '&&') 
+                self.position += 2
+                
+            elif current_char == "!":
+                self.next = Token('NOT', '!') 
+                self.position += 1
+                
+            elif current_char == "{":
+                self.next = Token('CHAVES_A', '{') 
+                self.position += 1
+            
+        
+            elif current_char == "}":
+                self.next = Token('CHAVES_F', '}') 
+                self.position += 1 
+                
+            elif current_char == ";":
+                self.next = Token('PV', ';') 
+                self.position += 1                
             
             else:
                 raise SyntaxError("Erro: Caractere inválido")

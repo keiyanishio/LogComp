@@ -23,22 +23,30 @@ class PrePro:
 class Parser:
     tokenizer = None
     
-    def block(self):
+    def parseProgram(self):
         children = []
-        #self.tokenizer.selectNext()
         
         while self.tokenizer.next.t_type != 'EOF':
-            children.append(self.statement())
-            #self.tokenizer.selectNext()
+            children.append(self.parseStatement())
         return Block(None, children)
     
-    def statement(self):
+    def parseBlock(self):
+        children = []
+        if self.tokenizer.next.t_type == 'CHAVES_A':
+            self.tokenizer.selectNext()
+            if self.tokenizer.next.t_type == 'NEWLINE':
+                self.tokenizer.selectNext()
+                while self.tokenizer.next.t_type != '}':
+                    children.append(self.parseStatement())
+        return Block(None, children)
+    
+    def parseStatement(self):
         if self.tokenizer.next.t_type == 'IDENTIFIER':
             identi = Identifier(self.tokenizer.next.value, [])
             self.tokenizer.selectNext()
             if self.tokenizer.next.t_type == 'EQUAL':
                 self.tokenizer.selectNext()
-                result = Assigment(None, [identi, self.parser_expression()])
+                result = Assigment(None, [identi, self.parseBoolExpression()])
                 #print(self.tokenizer.next.value)
                 if self.tokenizer.next.t_type == 'NEWLINE':
                     self.tokenizer.selectNext()
@@ -56,7 +64,7 @@ class Parser:
             if self.tokenizer.next.t_type == 'OPEN':
                 self.tokenizer.selectNext()
                 #print(self.tokenizer.next.value)
-                result = self.parser_expression()
+                result = self.parseBoolExpression()
                 #print(result.value)
                 if self.tokenizer.next.t_type == 'CLOSE':
                     self.tokenizer.selectNext()
@@ -72,21 +80,61 @@ class Parser:
                     raise SyntaxError("Erro: CLOSE")
             else:
                 raise SyntaxError("Erro: OPEN")
+            
+        elif self.tokenizer.next.t_type == 'IF':
+            self.tokenizer.SelectNext()
+            condition = self.parseBoolExpression()
+            block_if = self.parseBlock()
+            #self.tokenizer.SelectNext()
+            if self.tokenizer.next.t_type == 'ELSE':
+                block_else = self.parseBlock()
+                return IfCond(None, [block_else])
+            else:
+                return IfCond(None, [condition, block_if])
+        
+        
+        elif self.tokenizer.next.t_type == 'FOR':
+            self.tokenizer.SelectNext()
+            if self.tokenizer.next.t_type == 'IDENTIFIER':
+                identi = Identifier(self.tokenizer.next.value, [])
+                self.tokenizer.selectNext()
+                if self.tokenizer.next.t_type == 'EQUAL':
+                    self.tokenizer.selectNext()
+                    init = Assigment(None, [identi, self.parseBoolExpression()])
+                    if self.tokenizer.next.t_type == 'PV':
+                        self.tokenizer.selectNext()
+                        condition = self.parseBoolExpression()
+                        if self.tokenizer.next.t_type == 'PV':
+                            if self.tokenizer.next.t_type == 'IDENTIFIER':
+                                identi = Identifier(self.tokenizer.next.value, [])
+                                self.tokenizer.selectNext()
+                                if self.tokenizer.next.t_type == 'EQUAL':
+                                    self.tokenizer.selectNext()
+                                    inc = Assigment(None, [identi, self.parseBoolExpression()])
+                                    block_for = self.parseBlock()
+                                    if self.tokenizer.next.t_type == 'NEWLINE':
+                                        self.tokenizer.selectNext()
+                                        return ForLoop(None, [init, condition, inc, block_for])
+                                    elif self.tokenizer.next.t_type == 'EOF':
+                                        return ForLoop(None, [init, condition, inc, block_for])
+                                    else:
+                                        #print(repr(self.tokenizer.next.value))
+                                        raise SyntaxError("Erro: NEWLINE IDENTIFIER")
+                                                
+                        
+            else:
+                raise SyntaxError("Erro: init for")
 
         elif self.tokenizer.next.t_type == 'NEWLINE' or self.tokenizer.next.t_type == 'EOF':
             result = NoOp(None, None)
             return result
-        else:
-            raise SyntaxError("Erro: ERRO")
-
-    
-        #return NoOp(None, None)
-                    
+        # else:
+        #     raise SyntaxError("Erro: ERRO")                    
         
                 
         
     
-    def factor(self):
+    def parseFactor(self):
         
         #self.tokenizer.next.t_type
         if self.tokenizer.next.t_type == 'INT':
@@ -103,57 +151,111 @@ class Parser:
         
         elif self.tokenizer.next.t_type == 'PLUS':
             self.tokenizer.selectNext()
-            return UnOp("+", [self.factor()])
+            return UnOp("+", [self.parseFactor()])
         
         elif self.tokenizer.next.t_type == 'MINUS':
             self.tokenizer.selectNext()
-            return UnOp("-", [self.factor()])
+            return UnOp("-", [self.parseFactor()])
+        
+        elif self.tokenizer.next.t_type == 'NOT':
+            self.tokenizer.selectNext()
+            return UnOp("!", [self.parseFactor()])
         
         elif self.tokenizer.next.t_type == 'OPEN':
             self.tokenizer.selectNext()
-            result = self.parser_expression()
+            result = self.parseExpression()
             if self.tokenizer.next.t_type == 'CLOSE':
                 self.tokenizer.selectNext()
                 return result
             else:
                 raise SyntaxError("Erro: Caractere inválido")
+            
+        elif self.tokenizer.next.t_type == "SCANLN":
+            self.tokenizer.selectNext()
+            if self.tokenizer.next.t_type == 'OPEN':
+                self.tokenizer.selectNext()
+                if self.tokenizer.next.t_type == 'CLOSE':
+                    self.tokenizer.selectNext()
+                    return Scan(None, [])
+                else:
+                    raise SyntaxError("Erro: Caractere inválido")
         else:
             raise SyntaxError("Erro: Caractere inválido")
             
         
         
     
-    def parser_expression(self):
-        result = self.parser_term()
+    def parseExpression(self):
+        result = self.parseTerm()
         #print(result.value)
         while self.tokenizer.next.t_type == 'PLUS' or self.tokenizer.next.t_type == 'MINUS':
             op = self.tokenizer.next
             if op.t_type == 'PLUS':
                 self.tokenizer.selectNext()
-                result = BinOp(op.value, [result, self.parser_term()])
+                result = BinOp(op.value, [result, self.parseTerm()])
             elif op.t_type == 'MINUS':
                 self.tokenizer.selectNext()
-                result = BinOp(op.value, [result, self.parser_term()])
+                result = BinOp(op.value, [result, self.parseTerm()])
                    
         return result
     
     
     
-    def parser_term(self):
-        result = self.factor()
+    def parseTerm(self):
+        result = self.parseFactor()
         #print(result)
         while self.tokenizer.next.t_type == 'MULTI' or self.tokenizer.next.t_type == 'DIV':
             op = self.tokenizer.next
             
             if op.t_type == 'MULTI':
                 self.tokenizer.selectNext()
-                result = BinOp(op.value, [result, self.factor()])
+                result = BinOp(op.value, [result, self.parseFactor()])
             elif op.t_type == 'DIV':
                 self.tokenizer.selectNext()
-                result = BinOp(op.value, [result, self.factor()])
+                result = BinOp(op.value, [result, self.parseFactor()])
+                   
+        return result
+    
+    def parseBoolExpression(self):
+        result = self.parseBoolTerm()
+        #print(result)
+        while self.tokenizer.next.t_type == 'OR':
+            op = self.tokenizer.next
+            self.tokenizer.selectNext()
+            result = BinOp(op.value, [result, self.parseBoolTerm()])
+                   
+        return result
+    
+    def parseBoolTerm(self):
+        result = self.parseRelExpression()
+        #print(result)
+        while self.tokenizer.next.t_type == 'AND':
+            op = self.tokenizer.next
+            self.tokenizer.selectNext()
+            result = BinOp(op.value, [result, self.parseRelExpression()])
+                   
+        return result
+    
+    
+    def parseRelExpression(self):
+        result = self.parseExpression()
+        #print(result)
+        while self.tokenizer.next.t_type == 'EQUALCON' or self.tokenizer.next.t_type == 'GT' or self.tokenizer.next.t_type == 'LT':
+            op = self.tokenizer.next
+            
+            if op.t_type == 'EQUALCON':
+                self.tokenizer.selectNext()
+                result = BinOp(op.value, [result, self.parseExpression()])
+            elif op.t_type == 'GT':
+                self.tokenizer.selectNext()
+                result = BinOp(op.value, [result, self.parseExpression()])
+            elif op.t_type == 'LT':
+                self.tokenizer.selectNext()
+                result = BinOp(op.value, [result, self.parseExpression()])
                    
         return result
         
+    
             
 
 
@@ -161,7 +263,7 @@ class Parser:
         pre_processo = PrePro.filter(code)
         Parser.tokenizer = Tokenizer(pre_processo)
         self.tokenizer.selectNext()
-        result = self.block()
+        result = self.parseProgram()
         if self.tokenizer.next.t_type != 'EOF':
             raise SyntaxError("EOFFFFFFF")
         return result
