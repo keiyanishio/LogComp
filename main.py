@@ -34,11 +34,17 @@ class Parser:
         command = []
         if self.tokenizer.next.t_type == 'CHAVES_A':
             self.tokenizer.selectNext()
+            
             if self.tokenizer.next.t_type == 'NEWLINE':
                 self.tokenizer.selectNext()
                 while self.tokenizer.next.t_type != 'CHAVES_F':
                     command.append(self.parseStatement())
+            else:
+                raise SyntaxError("Erro: Abre Chaves no IF")
             self.tokenizer.selectNext()
+            
+            # if self.tokenizer.next.t_type == "NEWLINE":
+            #     raise SyntaxError("Erro: Sintaxe errado no else")
         return Block(None, command)
     
     def parseAssigments(self):
@@ -100,14 +106,22 @@ class Parser:
             block_if = self.parseBlock()
             if self.tokenizer.next.t_type == "ELSE":
                 self.tokenizer.selectNext()
-                #print(self.tokenizer.next.t_type)
                 block_else = self.parseBlock()
-                if self.tokenizer.next.t_type == "NEWLINE":
+                if self.tokenizer.next.t_type == "NEWLINE" or self.tokenizer.next.t_type == "EOF":
                     self.tokenizer.selectNext()
+                    if self.tokenizer.next.t_type == "CHAVES_A":
+                        raise SyntaxError("Erro: Sintaxe no else")
                     return IfCond(None, [condi, block_if, block_else])
-            else:
+            elif self.tokenizer.next.t_type == "EOF" or self.tokenizer.next.t_type == "NEWLINE":
                 self.tokenizer.selectNext()
+                if self.tokenizer.next.t_type == "ELSE" or self.tokenizer.next.t_type == "CHAVES_A":
+                    raise SyntaxError("Erro: Sintaxe no if ")
                 return IfCond(None, [condi, block_if])        
+            else:
+                raise SyntaxError("Erro: IDENTAÇÃO")
+        
+        
+        
         
         elif self.tokenizer.next.t_type == 'FOR':
             self.tokenizer.selectNext()

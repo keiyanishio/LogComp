@@ -31,4 +31,3 @@ for x_1 = 0; x_1 < 1 || x == 2; x_1 = x_1 + 1 {
 Println(x_1)
 Println(x)
 Println(z__+1)
-
