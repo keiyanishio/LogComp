@@ -25,7 +25,6 @@ class Parser:
     
     def parseProgram(self):
         children = []
-        
         while self.tokenizer.next.t_type != 'EOF':
             children.append(self.parseStatement())
         return Block(None, children)
@@ -59,6 +58,7 @@ class Parser:
                 
     
     def parseStatement(self):
+        
         if self.tokenizer.next.t_type == 'IDENTIFIER':
             identi = Identifier(self.tokenizer.next.value, [])
             self.tokenizer.selectNext()
@@ -142,13 +142,15 @@ class Parser:
                         #print(repr(self.tokenizer.next.value))
                         raise SyntaxError("Erro: NEWLINE IDENTIFIER")
                                                 
-                        
+        
             else:
                 raise SyntaxError("Erro: init for")
 
         elif self.tokenizer.next.t_type == 'NEWLINE' or self.tokenizer.next.t_type == 'EOF':
             result = NoOp(None, None)
-            return result                    
+            return result
+        else:
+            raise SyntaxError("Erro: caracter errado")
         
                 
         
@@ -167,6 +169,7 @@ class Parser:
             identi = Identifier(result, [])
             self.tokenizer.selectNext()
             return identi
+    
         
         elif self.tokenizer.next.t_type == 'PLUS':
             self.tokenizer.selectNext()

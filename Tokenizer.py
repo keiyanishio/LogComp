@@ -14,6 +14,8 @@ class Tokenizer:
     
     def selectNext(self):
         #print((self.source))
+        
+        
     
 
         if self.position < len(self.source):
@@ -43,7 +45,7 @@ class Tokenizer:
                 elif identifier == "Scanln":
                     self.next = Token('SCANLN', 'Scanln')
                     
-                elif identifier == "if":
+                elif identifier == "if": 
                     self.next = Token('IF', 'if')
                     
                 elif identifier == "else":
@@ -118,7 +120,7 @@ class Tokenizer:
                 self.position += 1
                 
             elif current_char == "{":
-                self.next = Token('CHAVES_A', '{') 
+                self.next = Token('CHAVES_A', '{')
                 self.position += 1
             
         
