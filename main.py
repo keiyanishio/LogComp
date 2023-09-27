@@ -31,14 +31,26 @@ class Parser:
         return Block(None, children)
     
     def parseBlock(self):
-        children = []
+        command = []
         if self.tokenizer.next.t_type == 'CHAVES_A':
             self.tokenizer.selectNext()
             if self.tokenizer.next.t_type == 'NEWLINE':
                 self.tokenizer.selectNext()
-                while self.tokenizer.next.t_type != '}':
-                    children.append(self.parseStatement())
-        return Block(None, children)
+                while self.tokenizer.next.t_type != 'CHAVES_F':
+                    command.append(self.parseStatement())
+            self.tokenizer.selectNext()
+        return Block(None, command)
+    
+    def parseAssigments(self):
+        if self.tokenizer.next.t_type == 'IDENTIFIER':
+            identi = Identifier(self.tokenizer.next.value, [])
+            self.tokenizer.selectNext()
+            
+            if self.tokenizer.next.t_type == 'EQUAL':
+                self.tokenizer.selectNext()
+                result = Assigment(None, [identi, self.parseBoolExpression()])
+                return result
+                
     
     def parseStatement(self):
         if self.tokenizer.next.t_type == 'IDENTIFIER':
@@ -81,45 +93,40 @@ class Parser:
             else:
                 raise SyntaxError("Erro: OPEN")
             
-        elif self.tokenizer.next.t_type == 'IF':
-            self.tokenizer.SelectNext()
-            condition = self.parseBoolExpression()
+            
+        elif self.tokenizer.next.t_type == "IF":
+            self.tokenizer.selectNext()
+            condi = self.parseBoolExpression()
             block_if = self.parseBlock()
-            #self.tokenizer.SelectNext()
-            if self.tokenizer.next.t_type == 'ELSE':
+            if self.tokenizer.next.t_type == "ELSE":
+                self.tokenizer.selectNext()
+                #print(self.tokenizer.next.t_type)
                 block_else = self.parseBlock()
-                return IfCond(None, [block_else])
+                if self.tokenizer.next.t_type == "NEWLINE":
+                    self.tokenizer.selectNext()
+                    return IfCond(None, [condi, block_if, block_else])
             else:
-                return IfCond(None, [condition, block_if])
-        
+                self.tokenizer.selectNext()
+                return IfCond(None, [condi, block_if])        
         
         elif self.tokenizer.next.t_type == 'FOR':
-            self.tokenizer.SelectNext()
-            if self.tokenizer.next.t_type == 'IDENTIFIER':
-                identi = Identifier(self.tokenizer.next.value, [])
+            self.tokenizer.selectNext()
+            init = self.parseAssigments()
+            if self.tokenizer.next.t_type == 'PV':
                 self.tokenizer.selectNext()
-                if self.tokenizer.next.t_type == 'EQUAL':
+                condition = self.parseBoolExpression()
+                if self.tokenizer.next.t_type == 'PV':
                     self.tokenizer.selectNext()
-                    init = Assigment(None, [identi, self.parseBoolExpression()])
-                    if self.tokenizer.next.t_type == 'PV':
+                    inc = self.parseAssigments()
+                    block_for = self.parseBlock()
+                    if self.tokenizer.next.t_type == 'NEWLINE':
                         self.tokenizer.selectNext()
-                        condition = self.parseBoolExpression()
-                        if self.tokenizer.next.t_type == 'PV':
-                            if self.tokenizer.next.t_type == 'IDENTIFIER':
-                                identi = Identifier(self.tokenizer.next.value, [])
-                                self.tokenizer.selectNext()
-                                if self.tokenizer.next.t_type == 'EQUAL':
-                                    self.tokenizer.selectNext()
-                                    inc = Assigment(None, [identi, self.parseBoolExpression()])
-                                    block_for = self.parseBlock()
-                                    if self.tokenizer.next.t_type == 'NEWLINE':
-                                        self.tokenizer.selectNext()
-                                        return ForLoop(None, [init, condition, inc, block_for])
-                                    elif self.tokenizer.next.t_type == 'EOF':
-                                        return ForLoop(None, [init, condition, inc, block_for])
-                                    else:
-                                        #print(repr(self.tokenizer.next.value))
-                                        raise SyntaxError("Erro: NEWLINE IDENTIFIER")
+                        return ForLoop("for", [init, condition, inc, block_for])
+                    elif self.tokenizer.next.t_type == 'EOF':
+                        return ForLoop("for", [init, condition, inc, block_for])
+                    else:
+                        #print(repr(self.tokenizer.next.value))
+                        raise SyntaxError("Erro: NEWLINE IDENTIFIER")
                                                 
                         
             else:
@@ -127,9 +134,7 @@ class Parser:
 
         elif self.tokenizer.next.t_type == 'NEWLINE' or self.tokenizer.next.t_type == 'EOF':
             result = NoOp(None, None)
-            return result
-        # else:
-        #     raise SyntaxError("Erro: ERRO")                    
+            return result                    
         
                 
         
@@ -163,7 +168,7 @@ class Parser:
         
         elif self.tokenizer.next.t_type == 'OPEN':
             self.tokenizer.selectNext()
-            result = self.parseExpression()
+            result = self.parseBoolExpression()
             if self.tokenizer.next.t_type == 'CLOSE':
                 self.tokenizer.selectNext()
                 return result
@@ -176,7 +181,7 @@ class Parser:
                 self.tokenizer.selectNext()
                 if self.tokenizer.next.t_type == 'CLOSE':
                     self.tokenizer.selectNext()
-                    return Scan(None, [])
+                    return Scan("Scanln", [])
                 else:
                     raise SyntaxError("Erro: Caractere inválido")
         else:
@@ -283,8 +288,3 @@ if __name__ == "__main__":
     teste = p.run(conteudo)
     teste.evaluate(ST)
     #print(ST.table)
-    
-    
-    
-    
-

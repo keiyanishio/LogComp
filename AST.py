@@ -84,21 +84,13 @@ class Scan(Node):
 class ForLoop(Node):
     def evaluate(self, ST):
         self.children[0].evaluate(ST)
-        
-        while True:  
-            condition = self.children[1].evaluate(ST)
-            if not condition:
-                break
-            for child in self.children[3]:
-                child.evaluate(ST)
+        while self.children[1].evaluate(ST):
+            self.children[3].evaluate(ST)
             self.children[2].evaluate(ST)
             
 class IfCond(Node):
     def evaluate(self, ST):
         if self.children[0].evaluate(ST):
-            for child in self.children[1]:
-                child.evaluate(ST)
-        else:
-            if len(self.children) > 2:
-                self.children[2].evaluate(ST)
-    
+            self.children[1].evaluate(ST)
+        elif (len(self.children)>2):
+            self.children[2].evaluate(ST)

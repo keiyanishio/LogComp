@@ -48,6 +48,9 @@ class Tokenizer:
                     
                 elif identifier == "else":
                     self.next = Token('ELSE', 'else')
+                    
+                elif identifier == "for":
+                    self.next = Token('FOR', 'for')
     
                 else:
                     self.next = Token('IDENTIFIER', identifier)
