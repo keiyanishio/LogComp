@@ -14,5 +14,8 @@
 ## Roteiro 5
 ![DS roteiro5](imgs/roteiro5.png)
 
+## Roteiro 6
+![DS roteiro6](imgs/roteiro6.png)
+
 ## EBNF-Roteiro 5
 ![EBNF](imgs/EBNF.png)
