@@ -4,7 +4,7 @@ class SymbolTable:
 
     def setter(self, key, value):
         if value[1] != self.table[key][1]:
-            raise SyntaxError("Tipo não combina: "+value[1]+"!="+self.table[key][1]) 
+            raise SyntaxError("Tipo não combina") 
         self.table[key] = value
         
     def getter(self, key):
