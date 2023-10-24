@@ -71,12 +71,7 @@ class Assigment(Node):
     
 class Identifier(Node):
     def evaluate(self, ST):
-        valor =  ST.getter(self.value)
-        if valor.isalpha():
-            return (valor, "string")
-        
-        elif valor.isdigit():
-            return (valor, "int")
+        return ST.getter(self.value)
             
             
 
@@ -87,7 +82,7 @@ class Block(Node):
             
 class Print(Node):
     def evaluate(self, ST):
-        print(self.children[0].evaluate(ST))
+        print(int(self.children[0].evaluate(ST)[0]))
         return 0
     
 ########################################################################
@@ -99,7 +94,7 @@ class Scan(Node):
 class ForLoop(Node):
     def evaluate(self, ST):
         self.children[0].evaluate(ST)
-        while self.children[1].evaluate(ST):
+        while self.children[1].evaluate(ST)[0]:
             self.children[3].evaluate(ST)
             self.children[2].evaluate(ST)
             
