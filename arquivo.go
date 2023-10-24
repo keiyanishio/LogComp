@@ -7,3 +7,5 @@ x = Scanln()
 
 // Println(x == y)
 
+// var x int
+// x = "insper"

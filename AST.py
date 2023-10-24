@@ -125,9 +125,9 @@ class VarDec(Node):
     def evaluate(self, ST):
         if len(self.children) == 1:
             if self.value == "int":
-                ST.create(self.children[0].value, (self.value, 0))
+                ST.create(self.children[0].value, (0, self.value))
             elif self.value == "string":
-                ST.create(self.children[0].value, (self.value, ""))
+                ST.create(self.children[0].value, ("", self.value))
             
         else:
             ST.create(self.children[0].value, (self.children[1].evaluate(ST)[0], self.value))
