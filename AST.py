@@ -11,40 +11,39 @@ class Node:
 class BinOp(Node):
     def evaluate(self, ST):
         
-        if self.children[0].evaluate(ST)[1] == self.children[1].evaluate(ST)[1]:
+        # left = self.children[0].evaluate(ST)
+        # right = self.children[1].evaluate(ST)
+        # print(left, right)
+        if self.value == "+":
+            return (self.children[0].evaluate(ST)[0] + self.children[1].evaluate(ST)[0], "int")
         
-            if self.value == "+":
-                return (self.children[0].evaluate(ST)[0] + self.children[1].evaluate(ST)[0], "int")
-            
-            elif self.value == "-":
-                return (self.children[0].evaluate(ST)[0] - self.children[1].evaluate(ST)[0], "int")
-            
-            elif self.value == "*":
-                return (self.children[0].evaluate(ST)[0] * self.children[1].evaluate(ST)[0], "int")
-            
-            elif self.value == "/":
-                return (self.children[0].evaluate(ST)[0] // self.children[1].evaluate(ST)[0], "int")
-            
-            elif self.value == "&&":
-                return (int(self.children[0].evaluate(ST)[0] and self.children[1].evaluate(ST)[0]), "int")
-            
-            elif self.value == "||":
-                return (int(self.children[0].evaluate(ST)[0] or self.children[1].evaluate(ST)[0]), "int")
-            
-            elif self.value == "<":
-                return (int(self.children[0].evaluate(ST)[0] < self.children[1].evaluate(ST)[0]), "int")
-            
-            elif self.value == ">":
-                return (int(self.children[0].evaluate(ST)[0] > self.children[1].evaluate(ST)[0]), "int")
-            
-            elif self.value == "==":
-                return (int(self.children[0].evaluate(ST)[0] == self.children[1].evaluate(ST)[0]), "int")
-            
-            elif self.value == ".":
-                return (self.children[0].evaluate(ST)[0] + self.children[1].evaluate(ST)[0], "string")
-        else:
-            raise SyntaxError("Tipos errados")
-            
+        elif self.value == "-":
+            return (self.children[0].evaluate(ST)[0] - self.children[1].evaluate(ST)[0], "int")
+        
+        elif self.value == "*":
+            return (self.children[0].evaluate(ST)[0] * self.children[1].evaluate(ST)[0], "int")
+        
+        elif self.value == "/":
+            return (self.children[0].evaluate(ST)[0] // self.children[1].evaluate(ST)[0], "int")
+        
+        elif self.value == "&&":
+            return (int(self.children[0].evaluate(ST)[0] and self.children[1].evaluate(ST)[0]), "int")
+        
+        elif self.value == "||":
+            return (int(self.children[0].evaluate(ST)[0] or self.children[1].evaluate(ST)[0]), "int")
+        
+        elif self.value == "<":
+            return (int(self.children[0].evaluate(ST)[0] < self.children[1].evaluate(ST)[0]), "int")
+        
+        elif self.value == ">":
+            return (int(self.children[0].evaluate(ST)[0] > self.children[1].evaluate(ST)[0]), "int")
+        
+        elif self.value == "==":
+            return (int(self.children[0].evaluate(ST)[0] == self.children[1].evaluate(ST)[0]), "int")
+        
+        elif self.value == ".":
+            return (str(self.children[0].evaluate(ST)[0]) + str(self.children[1].evaluate(ST)[0]), "string")
+
 
 class UnOp(Node):
     def evaluate(self, ST):
@@ -115,7 +114,7 @@ class VarDec(Node):
                 ST.create(self.children[0].value, (self.value, ""))
             
         else:
-            ST.create(self.children[0].value, (self.value, self.children[1].evaluate(ST)[1]))
+            ST.create(self.children[0].value, (self.children[1].evaluate(ST)[0], self.value))
             
             
 class StrVal(Node):

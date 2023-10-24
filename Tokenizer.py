@@ -88,8 +88,8 @@ class Tokenizer:
                 value = ""
                 while self.position < len(self.source) and self.source[self.position].isdigit():
                     value += self.source[self.position]
-                    if self.source[self.position+1].isalpha():
-                        raise SyntaxError("Erro: Caractere inválido")
+                    # if self.source[self.position+1].isalpha():
+                    #     raise SyntaxError("Erro: Caractere inválido")
                     #print(self.source[self.position+1])
                     self.position += 1
                 self.next = Token('INT', int(value))
