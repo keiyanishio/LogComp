@@ -79,6 +79,7 @@ class Tokenizer:
                 if current_char == '"':
                     identifier += current_char
                     self.position += 1
+                    identifier = identifier.strip('"')
                     self.next = Token('STRING', identifier)
                 else:
                     raise SyntaxError("String mal formada: aspa dupla de fechamento faltando")

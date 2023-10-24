@@ -23,7 +23,7 @@ class BinOp(Node):
                 return (self.children[0].evaluate(ST)[0] * self.children[1].evaluate(ST)[0], "int")
             
             elif self.value == "/":
-                return (self.children[0].evaluate(ST)[0] / self.children[1].evaluate(ST)[0], "int")
+                return (self.children[0].evaluate(ST)[0] // self.children[1].evaluate(ST)[0], "int")
             
             elif self.value == "&&":
                 return (int(self.children[0].evaluate(ST)[0] and self.children[1].evaluate(ST)[0]), "int")
@@ -82,7 +82,7 @@ class Block(Node):
             
 class Print(Node):
     def evaluate(self, ST):
-        print(int(self.children[0].evaluate(ST)[0]))
+        print(self.children[0].evaluate(ST)[0])
         return 0
     
 ########################################################################
@@ -108,14 +108,14 @@ class IfCond(Node):
 ########################################################################
 class VarDec(Node):
     def evaluate(self, ST):
-        if len(self.children) <= 1:
+        if len(self.children) == 1:
             if self.value == "int":
                 ST.create(self.children[0].value, (self.value, 0))
             elif self.value == "string":
                 ST.create(self.children[0].value, (self.value, ""))
             
         else:
-            ST.create(self.children[0].value, (self.value, self.children[1].evaluate()[1]))
+            ST.create(self.children[0].value, (self.value, self.children[1].evaluate(ST)[1]))
             
             
 class StrVal(Node):

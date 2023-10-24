@@ -155,7 +155,7 @@ class Parser:
                 self.tokenizer.selectNext()
                 if self.tokenizer.next.t_type == 'TYPE':
                     tipo = self.tokenizer.next.value 
-                    decvar =  VarDec(tipo, [identi])
+                    decvar = VarDec(tipo, [identi])
                     self.tokenizer.selectNext()
                     if self.tokenizer.next.t_type == 'EQUAL':
                         self.tokenizer.selectNext()
@@ -163,10 +163,12 @@ class Parser:
                         if self.tokenizer.next.t_type == 'NEWLINE':
                             self.tokenizer.selectNext()
                             return result
+                    elif self.tokenizer.next.t_type == 'NEWLINE' or self.tokenizer.next.t_type == 'EOF':
+                        self.tokenizer.selectNext()
+                        return decvar
                     else:
-                        if self.tokenizer.next.t_type == 'NEWLINE':
-                            self.tokenizer.selectNext()
-                            return decvar    
+                        raise SyntaxError("Erro: Na hora de declarar")
+                        
                             
                            
         elif self.tokenizer.next.t_type == 'NEWLINE' or self.tokenizer.next.t_type == 'EOF':
