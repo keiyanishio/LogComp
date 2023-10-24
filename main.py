@@ -146,9 +146,33 @@ class Parser:
             else:
                 raise SyntaxError("Erro: init for")
 
+        
+        
+        elif self.tokenizer.next.t_type == 'VAR':
+            self.tokenizer.selectNext()
+            if self.tokenizer.next.t_type == 'IDENTIFIER':
+                identi = Identifier(self.tokenizer.next.value, [])
+                self.tokenizer.selectNext()
+                if self.tokenizer.next.t_type == 'TYPE':
+                    tipo = self.tokenizer.next.value 
+                    decvar =  VarDec(tipo, [identi])
+                    self.tokenizer.selectNext()
+                    if self.tokenizer.next.t_type == 'EQUAL':
+                        self.tokenizer.selectNext()
+                        result = VarDec(tipo, [identi, self.parseBoolExpression()])
+                        if self.tokenizer.next.t_type == 'NEWLINE':
+                            self.tokenizer.selectNext()
+                            return result
+                    else:
+                        if self.tokenizer.next.t_type == 'NEWLINE':
+                            self.tokenizer.selectNext()
+                            return decvar    
+                            
+                           
         elif self.tokenizer.next.t_type == 'NEWLINE' or self.tokenizer.next.t_type == 'EOF':
             result = NoOp(None, None)
             return result
+            
         else:
             raise SyntaxError("Erro: caracter errado")
         
@@ -163,6 +187,12 @@ class Parser:
             self.tokenizer.selectNext()
             res = IntVal(result, [])
             return res
+        
+        if self.tokenizer.next.t_type == 'STRING':
+            result = self.tokenizer.next.value
+            self.tokenizer.selectNext()
+            string = StrVal(result, [])
+            return string
         
         elif self.tokenizer.next.t_type == "IDENTIFIER":
             result = self.tokenizer.next.value
@@ -210,12 +240,16 @@ class Parser:
     def parseExpression(self):
         result = self.parseTerm()
         #print(result.value)
-        while self.tokenizer.next.t_type == 'PLUS' or self.tokenizer.next.t_type == 'MINUS':
+        while self.tokenizer.next.t_type == 'PLUS' or self.tokenizer.next.t_type == 'MINUS' or self.tokenizer.next.t_type == 'CONCAT':
             op = self.tokenizer.next
             if op.t_type == 'PLUS':
                 self.tokenizer.selectNext()
                 result = BinOp(op.value, [result, self.parseTerm()])
             elif op.t_type == 'MINUS':
+                self.tokenizer.selectNext()
+                result = BinOp(op.value, [result, self.parseTerm()])
+
+            elif op.t_type == 'CONCAT':
                 self.tokenizer.selectNext()
                 result = BinOp(op.value, [result, self.parseTerm()])
                    

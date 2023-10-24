@@ -53,9 +53,35 @@ class Tokenizer:
                     
                 elif identifier == "for":
                     self.next = Token('FOR', 'for')
+                    
+                elif identifier == "var":
+                    self.next = Token('VAR', 'var')
+                    
+                elif identifier == "int":
+                    self.next = Token('TYPE', 'int')
+                    
+                elif identifier == "string":
+                    self.next = Token('TYPE', 'string')
     
                 else:
                     self.next = Token('IDENTIFIER', identifier)
+                    
+            elif current_char == '"':
+                identifier = current_char
+                self.position += 1
+                current_char = self.source[self.position]
+
+                while self.position < len(self.source) and current_char != '"':
+                    identifier += current_char
+                    self.position += 1
+                    current_char = self.source[self.position]
+
+                if current_char == '"':
+                    identifier += current_char
+                    self.position += 1
+                    self.next = Token('STRING', identifier)
+                else:
+                    raise SyntaxError("String mal formada: aspa dupla de fechamento faltando")
 
             elif current_char.isdigit():
                 value = ""
@@ -130,7 +156,11 @@ class Tokenizer:
                 
             elif current_char == ";":
                 self.next = Token('PV', ';') 
-                self.position += 1                
+                self.position += 1
+            
+            elif current_char == ".":
+                self.next = Token('CONCAT', '.') 
+                self.position += 1      
             
             else:
                 raise SyntaxError("Erro: Caractere inválido")

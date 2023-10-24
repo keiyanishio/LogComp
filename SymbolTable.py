@@ -7,3 +7,9 @@ class SymbolTable:
         
     def getter(self, key):
         return self.table[key]
+    
+    def create(self, key, value):
+        if key in self.table.keys():
+            raise SyntaxError("Essa variável já existe")
+        else:
+            self.table[key] = value
