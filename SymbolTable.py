@@ -3,6 +3,8 @@ class SymbolTable:
         self.table = {}
 
     def setter(self, key, value):
+        if value[0] != self.table[key][0]:
+            raise SyntaxError("Tipo não combina: "+value[0]+"!="+self.table[key][0]) 
         self.table[key] = value
         
     def getter(self, key):

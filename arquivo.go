@@ -1,4 +1,9 @@
+var x string
+x = Scanln()
 
-x1 = 1
-}
+
+// var x string = "a"
+// var y int = 1
+
+// Println(x == y)
 

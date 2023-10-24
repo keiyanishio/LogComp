@@ -340,7 +340,7 @@ if __name__ == "__main__":
     p = Parser()
     file = sys.argv[1]
     with open(file, 'r') as arquivo:
-        conteudo = arquivo.read()
+        conteudo = arquivo.read()+'\n'
     arquivo.close()
     
     #print("Input Content:")
