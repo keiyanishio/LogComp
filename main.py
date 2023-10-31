@@ -339,12 +339,16 @@ if __name__ == "__main__":
     ST = SymbolTable()
     p = Parser()
     file = sys.argv[1]
+    
+    
     with open(file, 'r') as arquivo:
         conteudo = arquivo.read()+'\n'
     arquivo.close()
     
     #print("Input Content:")
     #print(repr(conteudo))
+    Writer.write_start()
     teste = p.run(conteudo)
     teste.evaluate(ST)
+    Writer.write_end()
     #print(ST.table)

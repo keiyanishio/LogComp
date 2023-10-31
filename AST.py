@@ -77,8 +77,8 @@ class BinOp(Node):
             Writer.write_asm("CMP EAX, EBX")
             Writer.write_asm("CALL binop_je")
         
-        elif self.value == ".":
-            return (str(self.children[0].evaluate(ST)[0]) + str(self.children[1].evaluate(ST)[0]), "string")
+        # elif self.value == ".":
+        #     return (str(self.children[0].evaluate(ST)[0]) + str(self.children[1].evaluate(ST)[0]), "string")
 
 
 class UnOp(Node):
