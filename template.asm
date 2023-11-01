@@ -19,6 +19,8 @@ global _main ; windows
 extern _scanf ; windows
 
 extern _printf ; windows
+extern fflush
+extern stdout
 
 ; subrotinas i f / while
 binop_je :
@@ -37,6 +39,8 @@ binop_true :
 MOV EAX, True
 binop_exit :
 RET
+
+
 main :
 PUSH EBP ; guarda o base pointer
 MOV EBP, ESP ; e s t a b e l e c e um novo base pointer
@@ -91,7 +95,15 @@ PUSH EAX ; empilha f
 PUSH formatout ; formato i n t de saida
 CALL p r i n t f ; Print f
 ADD ESP, 8 ; limpa os argumentos
+
+
+
 ; interrupcao de saida ( d e f a u l t )
+PUSH DWORD [stdout]
+CALL fflush
+ADD ESP, 4
+MOV ESP, EBP
 POP EBP
 MOV EAX, 1
+XOR EBX, EBX
 INT 0x80

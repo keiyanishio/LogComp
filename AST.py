@@ -147,8 +147,8 @@ class Scan(Node):
 
 class ForLoop(Node):
     def evaluate(self, ST):
-        self.children[0].evaluate(ST)
         Writer.write_asm("LOOP_{}:".format(self.id))
+        self.children[0].evaluate(ST)
         self.children[1].evaluate(ST)
         Writer.write_asm("CMP EAX, False")
         Writer.write_asm("JE EXIT_{}".format(self.id))
