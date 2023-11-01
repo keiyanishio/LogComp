@@ -7,9 +7,9 @@ STDOUT equ 1
 True equ 1
 False equ 0
 segment .data
-formatin : db ”%d” , 0
-formatout : db ”%d” , 10 , 0 ; newline , nul terminator
-scanint : times 4 db 0 ; 32− b i t s i n t e g e r = 4 bytes
+formatin : db "%d" , 0
+formatout : db "%d" , 10 , 0 ; newline , nul terminator
+scanint : times 4 db 0 
 segment .bss ; variaveis
 res RESB 1
 section .text
@@ -19,8 +19,8 @@ global _main ; windows
 extern _scanf ; windows
 
 extern _printf ; windows
-extern fflush
-extern stdout
+extern _fflush
+extern _stdout
 
 ; subrotinas i f / while
 binop_je :
@@ -39,3 +39,9 @@ binop_true :
 MOV EAX, True
 binop_exit :
 RET
+
+main:
+
+PUSH EBP ; guarda o base pointer
+MOV EBP, ESP ; estabelece um novo base pointer
+

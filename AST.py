@@ -4,11 +4,12 @@ class Writer:
     @staticmethod
     def write_start():
         with open("teste1.asm", "a") as f:
-            with open("start.txt", "r") as start:
+            with open("start.txt", "r", encoding="utf-8") as start:
                 f.write(start.read()) 
     
     @staticmethod
     def write_asm(code):
+        code = code+"\n"
         Writer.text+=code
             
             
@@ -27,14 +28,15 @@ class Node:
         self.value = value 
         self.children = children
         self.id = self.newId()
-
-    def evaluate(self, ST):
-        pass
-    
+        
     @staticmethod
     def newId():
         Node.i += 1
         return Node.i
+
+    def evaluate(self, ST):
+        pass
+    
     
 class BinOp(Node):
     def evaluate(self, ST):
@@ -76,6 +78,8 @@ class BinOp(Node):
         elif self.value == "==":
             Writer.write_asm("CMP EAX, EBX")
             Writer.write_asm("CALL binop_je")
+            
+        return None
         
         # elif self.value == ".":
         #     return (str(self.children[0].evaluate(ST)[0]) + str(self.children[1].evaluate(ST)[0]), "string")
@@ -92,9 +96,9 @@ class UnOp(Node):
         
 class IntVal(Node):
     def evaluate(self, ST):
-        asm = "MOV EAX, "+self.value
+        asm = "MOV EAX, "+str(self.value)
         Writer.write_asm(asm)
-        #return (int(self.value), "int")
+        return None 
 
 class NoOp(Node):
     def evaluate(self, ST):
@@ -103,11 +107,20 @@ class NoOp(Node):
 ##########################################################################
 class Assigment(Node):
     def evaluate(self, ST):
+        variable = self.children[0].value 
         self.children[1].evaluate(ST)
-        identifier = ST.getter(self.value)
+        
+        identifier = ST.getter(variable)
         sp = identifier[2]
         asm = "MOV [EBP-{}], EAX".format(sp)
         Writer.write_asm(asm)
+            
+        # else:
+        #     Writer.write_asm("PUSH DWORD 0")
+        #     ST.create(self.children[0].value, None, self.value)
+            
+        #ST.setter(self.children[0].value,self.children[1].evaluate(ST))
+
     
     
 class Identifier(Node):
@@ -116,8 +129,6 @@ class Identifier(Node):
         sp = identifier[2]
         asm = "MOV EAX, [EBP-{}]".format(sp)
         Writer.write_asm(asm)
-            
-            
 
 class Block(Node):
     def evaluate(self, ST):
@@ -126,6 +137,7 @@ class Block(Node):
             
 class Print(Node):
     def evaluate(self, ST):
+        self.children[0].evaluate(ST)
         Writer.write_asm("PUSH EAX")
         Writer.write_asm("PUSH formatout")
         Writer.write_asm("CALL printf")
@@ -140,15 +152,15 @@ class Scan(Node):
         Writer.write_asm("PUSH formatin")
         Writer.write_asm("call scanf")
         Writer.write_asm("ADD ESP, 8")
-        Writer.write_asm("PUSH scanint")
+        #Writer.write_asm("PUSH scanint")
         Writer.write_asm("MOV EAX, DWORD [scanint]")
         return (int(input()), "int")
 
 
 class ForLoop(Node):
     def evaluate(self, ST):
-        Writer.write_asm("LOOP_{}:".format(self.id))
         self.children[0].evaluate(ST)
+        Writer.write_asm("LOOP_{}:".format(self.id))
         self.children[1].evaluate(ST)
         Writer.write_asm("CMP EAX, False")
         Writer.write_asm("JE EXIT_{}".format(self.id))
