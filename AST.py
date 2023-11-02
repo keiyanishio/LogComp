@@ -121,12 +121,6 @@ class Assigment(Node):
         sp = identifier[2]
         asm = "MOV [EBP-{}], EAX".format(sp)
         Writer.write_asm(asm)
-            
-        # else:
-        #     Writer.write_asm("PUSH DWORD 0")
-        #     ST.create(self.children[0].value, None, self.value)
-            
-        #ST.setter(self.children[0].value,self.children[1].evaluate(ST))
 
     
     
