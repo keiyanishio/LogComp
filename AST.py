@@ -140,7 +140,7 @@ class Print(Node):
         self.children[0].evaluate(ST)
         Writer.write_asm("PUSH EAX")
         Writer.write_asm("PUSH formatout")
-        Writer.write_asm("CALL _printf")
+        Writer.write_asm("CALL printf")
         Writer.write_asm("ADD ESP, 8")
         # print(self.children[0].evaluate(ST)[0])
         # return 0
@@ -150,7 +150,7 @@ class Scan(Node):
     def evaluate(self, ST):
         Writer.write_asm("PUSH scanint")
         Writer.write_asm("PUSH formatin")
-        Writer.write_asm("call _scanf")
+        Writer.write_asm("call scanf")
         Writer.write_asm("ADD ESP, 8")
         #Writer.write_asm("PUSH scanint")
         Writer.write_asm("MOV EAX, DWORD [scanint]")

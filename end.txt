@@ -1,6 +1,6 @@
 ; interrupcao de saida (default)
-PUSH DWORD [_stdout]
-CALL _fflush
+PUSH DWORD [stdout]
+CALL fflush
 ADD ESP, 4
 MOV ESP, EBP
 POP EBP

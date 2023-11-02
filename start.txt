@@ -16,11 +16,14 @@ segment .bss
 res RESB 1
 
 section .text
-global _main ; windows
-extern _scanf ; windows
-extern _printf ; windows
-extern _fflush
-extern _stdout
+global main ; linux
+; global _main ; windows
+extern fflush
+extern stdout 
+extern scanf ; linux
+extern printf ; linux
+; extern _scanf ; windows
+; extern _printf ; windows
 
 ; subrotinas if/while
 binop_je:
@@ -43,4 +46,3 @@ binop_exit:
 main:
     PUSH EBP ; guarda o base pointer
     MOV EBP, ESP ; estabelece um novo base pointer
-

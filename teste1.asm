@@ -16,11 +16,14 @@ segment .bss
 res RESB 1
 
 section .text
-global _main ; windows
-extern _scanf ; windows
-extern _printf ; windows
-extern _fflush
-extern _stdout
+global main ; linux
+; global _main ; windows
+extern fflush
+extern stdout 
+extern scanf ; linux
+extern printf ; linux
+; extern _scanf ; windows
+; extern _printf ; windows
 
 ; subrotinas if/while
 binop_je:
@@ -43,13 +46,12 @@ binop_exit:
 main:
     PUSH EBP ; guarda o base pointer
     MOV EBP, ESP ; estabelece um novo base pointer
-
 PUSH DWORD 0
 PUSH DWORD 0
 PUSH DWORD 0
 PUSH scanint
 PUSH formatin
-call _scanf
+call scanf
 ADD ESP, 8
 MOV EAX, DWORD [scanint]
 MOV [EBP-8], EAX
@@ -87,11 +89,11 @@ EXIT_32:
 MOV EAX, [EBP-12]
 PUSH EAX
 PUSH formatout
-CALL _printf
+CALL printf
 ADD ESP, 8
 ; interrupcao de saida (default)
-PUSH DWORD [_stdout]
-CALL _fflush
+PUSH DWORD [stdout]
+CALL fflush
 ADD ESP, 4
 MOV ESP, EBP
 POP EBP
