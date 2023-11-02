@@ -174,19 +174,19 @@ class ForLoop(Node):
             
 class IfCond(Node):
     def evaluate(self, ST):
-        Writer.write_asm("IF_{}".format(self.id))
+        Writer.write_asm("IF_{}:".format(self.id))
         self.children[0].evaluate(ST)
         Writer.write_asm("CMP EAX, False")
         Writer.write_asm("JE EXIT_{}".format(self.id))
         self.children[1].evaluate(ST)
         Writer.write_asm("JMP EXIT_{}".format(self.id))
-        Writer.write_asm("EXIT_{}".format(self.id))
+        Writer.write_asm("EXIT_{}:".format(self.id))
         
         if len(self.children) > 2:
-            Writer.write_asm("ELSE_{}".format(self.id))
+            Writer.write_asm("ELSE_{}:".format(self.id))
             self.children[2].evaluate(ST)
             Writer.write_asm("JMP EXIT_{}".format(self.id))
-            Writer.write_asm("EXIT_{}".format(self.id))
+            Writer.write_asm("EXIT_{}:".format(self.id))
         
         # if self.children[0].evaluate(ST):
         #     self.children[1].evaluate(ST)

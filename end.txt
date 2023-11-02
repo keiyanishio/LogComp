@@ -1,4 +1,4 @@
-; interrupcao de saida ( d e f a u l t )
+; interrupcao de saida (default)
 PUSH DWORD [stdout]
 CALL fflush
 ADD ESP, 4

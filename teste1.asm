@@ -6,41 +6,46 @@ STDIN equ 0
 STDOUT equ 1
 True equ 1
 False equ 0
+
 segment .data
-formatin : db "%d" , 0
-formatout : db "%d" , 10 , 0 ; newline , nul terminator
-scanint : times 4 db 0 
-segment .bss ; variaveis
+formatin: db "%d" , 0
+formatout: db "%d" , 10 , 0
+scanint: times 4 db 0 
+
+segment .bss
 res RESB 1
+
 section .text
-
 global _main ; windows
-
 extern _scanf ; windows
-
 extern _printf ; windows
 extern _fflush
 extern _stdout
 
-; subrotinas i f / while
-binop_je :
+; subrotinas if/while
+binop_je:
 JE binop_true
 JMP binop_false
-binop_jg :
+
+binop_jg:
 JG binop_true
 JMP binop_false
-binop_jl :
+
+binop_jl:
 JL binop_true
 JMP binop_false
-binop_false :
+
+binop_false:
 MOV EAX, False
 JMP binop_exit
-binop_true :
+
+binop_true:
 MOV EAX, True
-binop_exit :
+
+binop_exit:
 RET
 
-main:
+_main:
 
 PUSH EBP ; guarda o base pointer
 MOV EBP, ESP ; estabelece um novo base pointer
@@ -90,7 +95,7 @@ PUSH EAX
 PUSH formatout
 CALL printf
 ADD ESP, 8
-; interrupcao de saida ( d e f a u l t )
+; interrupcao de saida (default)
 PUSH DWORD [stdout]
 CALL fflush
 ADD ESP, 4
