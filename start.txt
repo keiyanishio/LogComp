@@ -12,7 +12,7 @@ formatin: db "%d", 0
 formatout: db "%d", 10, 0 ; newline, null terminator
 scanint: times 4 db 0 ; 32-bit integer = 4 bytes
 
-segment .bss ; variáveis
+segment .bss
 res RESB 1
 
 section .text

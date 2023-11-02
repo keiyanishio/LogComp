@@ -8,9 +8,9 @@ True equ 1
 False equ 0
 
 segment .data
-formatin: db "%d" , 0
-formatout: db "%d" , 10 , 0
-scanint: times 4 db 0 
+formatin: db "%d", 0
+formatout: db "%d", 10, 0 ; newline, null terminator
+scanint: times 4 db 0 ; 32-bit integer = 4 bytes
 
 segment .bss
 res RESB 1
@@ -24,38 +24,32 @@ extern _stdout
 
 ; subrotinas if/while
 binop_je:
-JE binop_true
-JMP binop_false
-
+    JE binop_true
+    JMP binop_false
 binop_jg:
-JG binop_true
-JMP binop_false
-
+    JG binop_true
+    JMP binop_false
 binop_jl:
-JL binop_true
-JMP binop_false
-
+    JL binop_true
+    JMP binop_false
 binop_false:
-MOV EAX, False
-JMP binop_exit
-
+    MOV EAX, False
+    JMP binop_exit
 binop_true:
-MOV EAX, True
-
+    MOV EAX, True
 binop_exit:
-RET
+    RET
 
-_main:
-
-PUSH EBP ; guarda o base pointer
-MOV EBP, ESP ; estabelece um novo base pointer
+main:
+    PUSH EBP ; guarda o base pointer
+    MOV EBP, ESP ; estabelece um novo base pointer
 
 PUSH DWORD 0
 PUSH DWORD 0
 PUSH DWORD 0
 PUSH scanint
 PUSH formatin
-call scanf
+call _scanf
 ADD ESP, 8
 MOV EAX, DWORD [scanint]
 MOV [EBP-8], EAX
@@ -93,11 +87,11 @@ EXIT_32:
 MOV EAX, [EBP-12]
 PUSH EAX
 PUSH formatout
-CALL printf
+CALL _printf
 ADD ESP, 8
 ; interrupcao de saida (default)
-PUSH DWORD [stdout]
-CALL fflush
+PUSH DWORD [_stdout]
+CALL _fflush
 ADD ESP, 4
 MOV ESP, EBP
 POP EBP
