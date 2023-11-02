@@ -1,9 +1,14 @@
-
+import sys
 class Writer:
+    
     text = ''
+    
     @staticmethod
     def write_start():
-        with open("teste1.asm", "a") as f:
+        file = sys.argv[1]
+        file = file.split(".")
+        test = file[0]+".asm"
+        with open(test, "w") as f:
             with open("start.txt", "r", encoding="utf-8") as start:
                 f.write(start.read()) 
     
@@ -12,10 +17,12 @@ class Writer:
         code = code+"\n"
         Writer.text+=code
             
-            
     @staticmethod
     def write_end():
-        with open("teste1.asm", 'a') as file:
+        file = sys.argv[1]
+        file = file.split(".")
+        test = file[0]+".asm"
+        with open(test, 'a') as file:
             with open("end.txt", "r") as end:
                 file.write(Writer.text+end.read())
     
@@ -177,14 +184,15 @@ class IfCond(Node):
         Writer.write_asm("IF_{}:".format(self.id))
         self.children[0].evaluate(ST)
         Writer.write_asm("CMP EAX, False")
-        Writer.write_asm("JE EXIT_{}".format(self.id))
-        self.children[1].evaluate(ST)
-        Writer.write_asm("JMP EXIT_{}".format(self.id))
-        Writer.write_asm("EXIT_{}:".format(self.id))
-        
         if len(self.children) > 2:
             Writer.write_asm("ELSE_{}:".format(self.id))
             self.children[2].evaluate(ST)
+            Writer.write_asm("JMP EXIT_{}".format(self.id))
+            Writer.write_asm("EXIT_{}:".format(self.id))
+            
+        else:
+            Writer.write_asm("JE EXIT_{}".format(self.id))
+            self.children[1].evaluate(ST)
             Writer.write_asm("JMP EXIT_{}".format(self.id))
             Writer.write_asm("EXIT_{}:".format(self.id))
         

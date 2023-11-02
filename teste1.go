@@ -1,9 +1,15 @@
-var i int
-var n int
-var f int
-n = Scanln()
-f = 1
-for i = 2; i < n + 1; i = i + 1 {
-	f = f * i
+var x int
+var y int
+x = 3+1
+y = x
+if x > 1 {
+    x = 5-1
 }
-Println(f)
+if (x == 3) {
+} else {
+    x = 3
+}
+for x = 3; x < 5; x = x + 1 {
+    y = x - 1
+}
+Println(x)
