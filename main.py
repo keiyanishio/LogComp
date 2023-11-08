@@ -26,8 +26,53 @@ class Parser:
     def parseProgram(self):
         children = []
         while self.tokenizer.next.t_type != 'EOF':
-            children.append(self.parseStatement())
+            children.append(self.parseDeclaration())
         return Block(None, children)
+    
+    
+    def parseDeclaration(self):
+        args = []
+        
+        if self.tokenizer.next.t_type == 'FUNC':
+            self.tokenizer.selectNext()
+            
+            if self.tokenizer.next.t_type == 'IDENTIFIER':
+                func_name = Identifier(self.tokenizer.next.value, [])
+                self.tokenizer.selectNext()
+                
+                if self.tokenizer.next.t_type == 'OPEN':
+                    
+                    while self.tokenizer.next.t_type != 'CLOSE':
+                        self.tokenizer.selectNext()
+                        
+                        if self.tokenizer.next.t_type == 'IDENTIFIER':
+                            arg = Identifier(self.tokenizer.next.value, [])
+                            self.tokenizer.selectNext()
+                            
+                            if self.tokenizer.next.t_type == 'TYPE':
+                                tipo = self.tokenizer.next.value
+                                args.append(VarDec(tipo, [arg]))
+                                self.tokenizer.selectNext()
+                                
+                                if self.tokenizer.next.t_type == 'CLOSE':
+                                    break
+                                
+                                elif self.tokenizer.next.t_type == 'VIRGULA':
+                                    continue
+                
+                    self.tokenizer.selectNext()
+                    if self.tokenizer.next.t_type == 'TYPE':
+                        func_type = self.tokenizer.next.value
+                        self.tokenizer.selectNext()
+                        block = self.parseBlock()
+                        if self.tokenizer.next.t_type == 'NEWLINE':
+                            self.tokenizer.selectNext()
+                            return FuncDec(func_type, [func_name, args, block])
+                        elif self.tokenizer.next.t_type == 'EOF':
+                            return FuncDec(func_type, [func_name, args, block])
+                else:
+                    raise SyntaxError("Erro: Faltou colocar o ( no comceço da função")
+                                    
     
     def parseBlock(self):
         command = []
@@ -47,6 +92,7 @@ class Parser:
         return Block(None, command)
     
     def parseAssigments(self):
+        args = []
         if self.tokenizer.next.t_type == 'IDENTIFIER':
             identi = Identifier(self.tokenizer.next.value, [])
             self.tokenizer.selectNext()
@@ -55,8 +101,24 @@ class Parser:
                 self.tokenizer.selectNext()
                 result = Assigment(None, [identi, self.parseBoolExpression()])
                 return result
-                
-    
+            
+            elif self.tokenizer.next.t_type == 'OPEN':
+                self.tokenizer.selectNext()
+                if self.tokenizer.next.t_type == 'CLOSE':
+                    result = FuncCall(identi.value, [])
+                    self.tokenizer.selectNext()
+                else:
+                    while self.tokenizer.next.t_type != 'CLOSE':
+                        self.tokenizer.selectNext()
+                        arg = self.parseBoolExpression()
+                        args.append(arg)
+                    result = FuncCall(identi.value, args)
+                        
+                return result
+                        
+                    
+            
+                    
     def parseStatement(self):
         
         if self.tokenizer.next.t_type == 'IDENTIFIER':
@@ -176,7 +238,9 @@ class Parser:
                     else:
                         raise SyntaxError("Erro: Na hora de declarar")
                         
-                            
+        elif self.tokenizer.next.t_type == 'RETURN':
+            self.tokenizer.selectNext()
+            return ReturnNode(None, [self.parseBoolExpression])
                            
         elif self.tokenizer.next.t_type == 'NEWLINE' or self.tokenizer.next.t_type == 'EOF':
             result = NoOp(None, None)
@@ -189,7 +253,7 @@ class Parser:
         
     
     def parseFactor(self):
-        
+        args = []
         #self.tokenizer.next.t_type
         if self.tokenizer.next.t_type == 'INT':
             result = self.tokenizer.next.value
@@ -207,6 +271,12 @@ class Parser:
             result = self.tokenizer.next.value
             identi = Identifier(result, [])
             self.tokenizer.selectNext()
+            if self.tokenizer.next.t_type == "OPEN":
+                while self.tokenizer.next.t_type != "CLOSE":
+                    self.tokenizer.selectNext()
+                    arg = self.parseBoolExpression()
+                    args.append(arg)
+                return FuncCall(identi.value, args)
             return identi
     
         

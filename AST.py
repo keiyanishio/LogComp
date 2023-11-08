@@ -138,3 +138,15 @@ class StrVal(Node):
         return (self.value, "string")
     
 ########################################################################
+
+class FuncDec(Node):
+    def evaluate(self, ST):
+        return None
+
+class FuncCall(Node):
+    def evaluate(self, ST):
+        return None
+    
+class ReturnNode(Node):
+    def evaluate(self, ST):
+        return None
