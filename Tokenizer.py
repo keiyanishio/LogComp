@@ -62,6 +62,12 @@ class Tokenizer:
                     
                 elif identifier == "string":
                     self.next = Token('TYPE', 'string')
+                
+                elif identifier == "func":
+                    self.next = Token('FUNC', 'func')
+                    
+                elif identifier == "return":
+                    self.next = Token('RETURN', 'return')
     
                 else:
                     self.next = Token('IDENTIFIER', identifier)
@@ -161,6 +167,10 @@ class Tokenizer:
             
             elif current_char == ".":
                 self.next = Token('CONCAT', '.') 
+                self.position += 1
+                
+            elif current_char == ",":
+                self.next = Token('VIRGULA', ',') 
                 self.position += 1      
             
             else:
