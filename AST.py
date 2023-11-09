@@ -1,3 +1,7 @@
+from FuncTable import *
+from SymbolTable import *
+
+FT = FuncTable()
 
 class Node:
     def __init__(self, value, children):
@@ -141,12 +145,19 @@ class StrVal(Node):
 
 class FuncDec(Node):
     def evaluate(self, ST):
-        return None
+        if len(self.children) != 3:
+            raise SyntaxError("Erro: Função declarada errada")
+        FT.setter(self.children[0].value, (self, self.value))
 
 class FuncCall(Node):
     def evaluate(self, ST):
-        return None
+        call = FT.getter(self.value)
+        new_symboltable = SymbolTable()
+        for i in len(self.children):
+            self.children[i+1].evaluate(new_symboltable)
+            new_symboltable.setter(call.children[0].value, self.children[i].evaluate(ST))
+        return self.children[-1].evaluate(new_symboltable)
     
 class ReturnNode(Node):
     def evaluate(self, ST):
-        return None
+        return self.children[0].evaluate(ST)

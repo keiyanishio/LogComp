@@ -4,6 +4,7 @@ from Tokenizer import *
 from AST import *
 from SymbolTable import *
 
+
 class PrePro:
     @staticmethod
     def filter(source):
@@ -112,7 +113,7 @@ class Parser:
                         self.tokenizer.selectNext()
                         arg = self.parseBoolExpression()
                         args.append(arg)
-                    result = FuncCall(identi.value, args)
+                    result = FuncCall(identi.value, [args])
                         
                 return result
                         
@@ -276,7 +277,7 @@ class Parser:
                     self.tokenizer.selectNext()
                     arg = self.parseBoolExpression()
                     args.append(arg)
-                return FuncCall(identi.value, args)
+                return FuncCall(identi.value, [args])
             return identi
     
         
