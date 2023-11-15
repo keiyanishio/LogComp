@@ -80,42 +80,6 @@ class Parser:
                                     self.tokenizer.selectNext()
                                     block = self.parseBlock()
                                     return FuncDec(func_type, [func_name, args, block])
-                            
-                        
-        #             while self.tokenizer.next.t_type != 'CLOSE':
-                        
-        #                 if self.tokenizer.next.t_type == 'IDENTIFIER':
-        #                     arg = Identifier(self.tokenizer.next.value, [])
-        #                     self.tokenizer.selectNext()
-                            
-        #                     if self.tokenizer.next.t_type == 'TYPE':
-        #                         tipo = self.tokenizer.next.value
-        #                         args.append(VarDec(tipo, [arg]))
-        #                         self.tokenizer.selectNext()
-                                
-        #                         if self.tokenizer.next.t_type == 'CLOSE':
-        #                             break
-                                
-        #                         elif self.tokenizer.next.t_type == 'VIRGULA':
-        #                             continue
-                
-        #             self.tokenizer.selectNext()
-        #             if self.tokenizer.next.t_type == 'TYPE':
-        #                 func_type = self.tokenizer.next.value
-        #                 self.tokenizer.selectNext()
-        #                 block = self.parseBlock()
-        #                 if self.tokenizer.next.t_type == 'NEWLINE':
-        #                     self.tokenizer.selectNext()
-        #                     return FuncDec(func_type, [func_name, args, block])
-        #                 elif self.tokenizer.next.t_type == 'EOF':
-        #                     return FuncDec(func_type, [func_name, args, block])
-        #             else:
-        #                 raise SyntaxError("Erro: Faltou colocar o tipo da função")
-        #         else:
-        #             raise SyntaxError("Erro: Faltou colocar o ( no comceço da função")
-        # else:
-        #     raise SyntaxError("Erro: Não tem função")
-                                    
     
     def parseBlock(self):
         command = []
@@ -129,10 +93,6 @@ class Parser:
             else:
                 raise SyntaxError("Erro: Abre Chaves no IF")
             self.tokenizer.selectNext()
-            #print(self.tokenizer.next.value)
-            
-            # if self.tokenizer.next.t_type == "NEWLINE":
-            #     raise SyntaxError("Erro: Sintaxe errado no else")
         return Block(None, command)
     
     def parseAssigments(self):
@@ -164,40 +124,10 @@ class Parser:
                 else:
                     return FuncCall(identi.value, [])
                     
-                # if self.tokenizer.next.t_type == 'CLOSE':
-                #     result = FuncCall(identi.value, [])
-                #     self.tokenizer.selectNext()
-                # else:
-                #     while self.tokenizer.next.t_type != 'CLOSE':
-                #         self.tokenizer.selectNext()
-                #         arg = self.parseBoolExpression()
-                #         args.append(arg)
-                #     result = FuncCall(identi.value, [args])
-                        
-                # return result
-                        
-                    
             
                     
     def parseStatement(self):
-        #print(self.tokenizer.next.value,self.tokenizer.next.t_type )
         if self.tokenizer.next.t_type == 'IDENTIFIER':
-            # identi = Identifier(self.tokenizer.next.value, [])
-            # self.tokenizer.selectNext()
-            # if self.tokenizer.next.t_type == 'EQUAL':
-            #     self.tokenizer.selectNext()
-            #     result = Assigment(None, [identi, self.parseBoolExpression()])
-            #     #print(self.tokenizer.next.value)
-            #     if self.tokenizer.next.t_type == 'NEWLINE':
-            #         self.tokenizer.selectNext()
-            #         return result
-            #     elif self.tokenizer.next.t_type == 'EOF':
-            #         return result
-            #     else:
-            #         #print(repr(self.tokenizer.next.value))
-            #         raise SyntaxError("Erro: NEWLINE IDENTIFIER")
-            # else:
-            #     raise SyntaxError("Erro: EQUAL")
             self.parseAssigments()
             self.tokenizer.selectNext()
 
