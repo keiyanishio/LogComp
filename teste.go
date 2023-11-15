@@ -72,9 +72,11 @@ func soma(x int, y int) int {
 	return a
 }
 
-var a int
-var b int
-a = 3
-b = soma(a, 4)
-Println(a)
-Println(b)
+func main() int{
+	var a int
+	var b int
+	a = 3
+	b = soma(a, 4)
+	Println(a)
+	Println(b)
+}

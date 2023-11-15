@@ -149,15 +149,22 @@ class FuncDec(Node):
             raise SyntaxError("Erro: Função declarada errada")
         FT.setter(self.children[0].value, (self, self.value))
 
-class FuncCall(Node):
-    def evaluate(self, ST):
-        call = FT.getter(self.value)
-        new_symboltable = SymbolTable()
-        for i in len(self.children):
-            self.children[i+1].evaluate(new_symboltable)
-            new_symboltable.setter(call.children[0].value, self.children[i].evaluate(ST))
-        return self.children[-1].evaluate(new_symboltable)
     
 class ReturnNode(Node):
     def evaluate(self, ST):
         return self.children[0].evaluate(ST)
+    
+    
+class FuncCall(Node):
+    def evaluate(self, ST):
+        call = FT.getter(self.value)
+        
+        if len(call.children) != len(self.children)+2:
+            raise SyntaxError("Número de argumentos errados")
+        
+        nst = SymbolTable()
+        for i in range(len(self.children)):
+            call.children[i+1].evaluate(nst)
+            nst.setter(call.children[i+1].children[0].value, self.children[i].evaluate(nst))
+        return self.children[-1].evaluate(nst)
+    

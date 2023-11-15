@@ -31,6 +31,10 @@ class Tokenizer:
                 self.position += 1
                 self.selectNext()
                 
+            elif current_char == ",":
+                self.next = Token('VIRGULA', ',') 
+                self.position += 1 
+                
             elif current_char.isalpha() or current_char == "_":
                 identifier = ""
                 while self.position < len(self.source) and (current_char.isalnum() or current_char == "_"):
@@ -169,9 +173,7 @@ class Tokenizer:
                 self.next = Token('CONCAT', '.') 
                 self.position += 1
                 
-            elif current_char == ",":
-                self.next = Token('VIRGULA', ',') 
-                self.position += 1      
+     
             
             else:
                 raise SyntaxError("Erro: Caractere inválido")
