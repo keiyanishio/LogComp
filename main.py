@@ -114,14 +114,9 @@ class Parser:
             if self.tokenizer.next.t_type == 'EQUAL':
                 self.tokenizer.selectNext()
                 result = Assigment(None, [identi, self.parseBoolExpression()])
-                if self.tokenizer.next.t_type == 'NEWLINE':
-                    return result
-                elif self.tokenizer.next.t_type == 'EOF':
-                    return result
-                else:
-                    #print(repr(self.tokenizer.next.value))
+                if self.tokenizer.next.t_type == 'IDENTIFIER':
                     raise SyntaxError("Erro: NEWLINE IDENTIFIER")
-            
+                return result
             elif self.tokenizer.next.t_type == 'OPEN':
                 self.tokenizer.selectNext()
                 
