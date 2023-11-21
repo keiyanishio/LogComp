@@ -3,6 +3,7 @@ import re
 from Tokenizer import *
 from AST import *
 from SymbolTable import *
+from FuncTable import *
 
 
 class PrePro:
@@ -28,19 +29,20 @@ class Parser:
         children = []
         while self.tokenizer.next.t_type != 'EOF':
             children.append(self.parseDeclaration())
+        children_main = FuncCall("main", [])
+        children.append(children_main)
         return Block(None, children)
     
     
     def parseDeclaration(self):
-        args = []
+        
         while self.tokenizer.next.t_type == 'NEWLINE':
             self.tokenizer.selectNext()
         
         if self.tokenizer.next.t_type == 'FUNC':
             self.tokenizer.selectNext()
-            
+            result = FuncDec(None, [])
             if self.tokenizer.next.t_type == 'IDENTIFIER':
-                #print(self.tokenizer.next.value)
                 func_name = Identifier(self.tokenizer.next.value, [])
                 self.tokenizer.selectNext()
                 
@@ -52,15 +54,18 @@ class Parser:
                             func_type = self.tokenizer.next.value
                             self.tokenizer.selectNext()
                             block = self.parseBlock()
-                            return FuncDec(func_type, [func_name, args, block])
+                            var_name = VarDec(func_type, [func_name])
+                        
+                            return FuncDec(None, [var_name, block])
                             
                             
                     elif self.tokenizer.next.t_type == 'IDENTIFIER':
+                        
                         arg = Identifier(self.tokenizer.next.value, [])
                         self.tokenizer.selectNext()
                         if self.tokenizer.next.t_type == 'TYPE':
                             tipo = self.tokenizer.next.value
-                            args.append(VarDec(tipo, [arg]))
+                            result.children.append(VarDec(tipo, [arg]))
                             self.tokenizer.selectNext()
                             
                             while self.tokenizer.next.t_type == 'VIRGULA':
@@ -70,7 +75,7 @@ class Parser:
                                     self.tokenizer.selectNext()
                                     if self.tokenizer.next.t_type == 'TYPE':
                                         tipo = self.tokenizer.next.value
-                                        args.append(VarDec(tipo, [arg]))
+                                        result.children.append(VarDec(tipo, [arg]))
                                         self.tokenizer.selectNext()
                                     
                             if self.tokenizer.next.t_type == 'CLOSE':
@@ -79,7 +84,10 @@ class Parser:
                                     func_type = self.tokenizer.next.value
                                     self.tokenizer.selectNext()
                                     block = self.parseBlock()
-                                    return FuncDec(func_type, [func_name, args, block])
+                                    result.children.append(block)
+                                    var_name = VarDec(func_type, [func_name])
+                                    result.children.insert(0, var_name)
+                                    return result
     
     def parseBlock(self):
         command = []
@@ -95,6 +103,8 @@ class Parser:
             self.tokenizer.selectNext()
         return Block(None, command)
     
+    
+    
     def parseAssigments(self):
         args = []
         if self.tokenizer.next.t_type == 'IDENTIFIER':
@@ -104,7 +114,13 @@ class Parser:
             if self.tokenizer.next.t_type == 'EQUAL':
                 self.tokenizer.selectNext()
                 result = Assigment(None, [identi, self.parseBoolExpression()])
-                return result
+                if self.tokenizer.next.t_type == 'NEWLINE':
+                    return result
+                elif self.tokenizer.next.t_type == 'EOF':
+                    return result
+                else:
+                    #print(repr(self.tokenizer.next.value))
+                    raise SyntaxError("Erro: NEWLINE IDENTIFIER")
             
             elif self.tokenizer.next.t_type == 'OPEN':
                 self.tokenizer.selectNext()
@@ -119,17 +135,24 @@ class Parser:
                     
                     if self.tokenizer.next.t_type == 'CLOSE':
                         self.tokenizer.selectNext()
-                        return FuncCall(identi.value, [args])
-                    
-                else:
+                        return FuncCall(identi.value, args)
+                    else:
+                        raise SyntaxError("Erro: fecha funccall")
+                elif self.tokenizer.next.t_type == 'CLOSE':
+                    self.tokenizer.selectNext()
                     return FuncCall(identi.value, [])
+                else:
+                    raise SyntaxError("Erro: fecha funccall")
+            else:
+                raise SyntaxError("Erro: fecha funccall")
                     
             
                     
     def parseStatement(self):
         if self.tokenizer.next.t_type == 'IDENTIFIER':
-            self.parseAssigments()
+            assign = self.parseAssigments()
             self.tokenizer.selectNext()
+            return assign
 
         elif self.tokenizer.next.t_type == 'PRINTLN':
             self.tokenizer.selectNext()
@@ -243,24 +266,24 @@ class Parser:
         
     
     def parseFactor(self):
-        args = []
+        
         if self.tokenizer.next.t_type == 'INT':
             result = self.tokenizer.next.value
             self.tokenizer.selectNext()
             res = IntVal(result, [])
             return res
         
-        if self.tokenizer.next.t_type == 'STRING':
+        elif self.tokenizer.next.t_type == 'STRING':
             result = self.tokenizer.next.value
             self.tokenizer.selectNext()
             string = StrVal(result, [])
             return string
         
         elif self.tokenizer.next.t_type == "IDENTIFIER":
+            args = []
             result = self.tokenizer.next.value
             identi = Identifier(result, [])
             self.tokenizer.selectNext()
-            
             if self.tokenizer.next.t_type == 'OPEN':
                 self.tokenizer.selectNext()
                 
@@ -274,10 +297,11 @@ class Parser:
                     
                     if self.tokenizer.next.t_type == 'CLOSE':
                         self.tokenizer.selectNext()
-                        return FuncCall(identi.value, [args])
+                        return FuncCall(identi.value, args)
                     
                 else:
-                    return FuncCall(identi.value, [])
+                    self.tokenizer.selectNext()
+                    return FuncCall(identi.value, args)
             else:
                 return identi
     
@@ -309,7 +333,8 @@ class Parser:
                 self.tokenizer.selectNext()
                 if self.tokenizer.next.t_type == 'CLOSE':
                     self.tokenizer.selectNext()
-                    return Scan("Scanln", [])
+                    if self.tokenizer.next.t_type == 'NEWLINE':
+                        return Scan("Scanln", [])
                 else:
                     raise SyntaxError("Erro: Caractere inválido")
         else:
@@ -409,6 +434,7 @@ class Parser:
     
 if __name__ == "__main__":
     ST = SymbolTable()
+    FT = FuncTable()
     p = Parser()
     file = sys.argv[1]
     with open(file, 'r') as arquivo:
@@ -419,4 +445,4 @@ if __name__ == "__main__":
     #print(repr(conteudo))
     teste = p.run(conteudo)
     teste.evaluate(ST)
-    #print(ST.table)
+    #print(FT.table)

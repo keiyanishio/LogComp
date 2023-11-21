@@ -97,12 +97,13 @@ class Identifier(Node):
 class Block(Node):
     def evaluate(self, ST):
         for child in self.children:
+            if isinstance(child, ReturnNode):
+                return child.evaluate(ST)
             child.evaluate(ST)
             
 class Print(Node):
     def evaluate(self, ST):
         print(self.children[0].evaluate(ST)[0])
-        return 0
     
 ########################################################################
 class Scan(Node):
@@ -143,28 +144,26 @@ class StrVal(Node):
     
 ########################################################################
 
-class FuncDec(Node):
-    def evaluate(self, ST):
-        if len(self.children) != 3:
-            raise SyntaxError("Erro: Função declarada errada")
-        FT.setter(self.children[0].value, (self, self.value))
 
     
 class ReturnNode(Node):
     def evaluate(self, ST):
         return self.children[0].evaluate(ST)
     
+class FuncDec(Node):
+    def evaluate(self, ST):
+        FT.setter(self.children[0].children[0].value, (self, self.children[0].value))
     
 class FuncCall(Node):
     def evaluate(self, ST):
         call = FT.getter(self.value)
         
-        if len(call.children) != len(self.children)+2:
+        if len(call[0].children) != len(self.children)+2:
             raise SyntaxError("Número de argumentos errados")
         
         nst = SymbolTable()
         for i in range(len(self.children)):
-            call.children[i+1].evaluate(nst)
-            nst.setter(call.children[i+1].children[0].value, self.children[i].evaluate(nst))
-        return self.children[-1].evaluate(nst)
+            call[0].children[i+1].evaluate(nst)
+            nst.setter(call[0].children[i+1].children[0].value, self.children[i].evaluate(ST))
+        return call[0].children[-1].evaluate(nst)
     
