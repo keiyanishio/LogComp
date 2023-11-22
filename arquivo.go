@@ -1,9 +1,14 @@
+func main() int {
+    Println(1)
+}
+
+
 // func main() int {
-//     Println(1)
+//     var x int
+//     x = 1 x
 // }
 
-
-func main() int {
-    var x int
-    x = 1 x
-}
+// func main() int {
+//     var x int
+//     x = 1,
+// }
