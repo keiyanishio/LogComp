@@ -88,6 +88,8 @@ class Parser:
                                     var_name = VarDec(func_type, [func_name])
                                     result.children.insert(0, var_name)
                                     return result
+        else:
+            raise SyntaxError("Erro: Precisa de função")
     
     def parseBlock(self):
         command = []
