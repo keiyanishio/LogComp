@@ -153,9 +153,7 @@ class Parser:
             self.tokenizer.selectNext()
             if self.tokenizer.next.t_type == 'OPEN':
                 self.tokenizer.selectNext()
-                #print(self.tokenizer.next.value)
                 result = self.parseBoolExpression()
-                #print(result.value)
                 if self.tokenizer.next.t_type == 'CLOSE':
                     self.tokenizer.selectNext()
                     final = Print(None, [result])
@@ -275,28 +273,28 @@ class Parser:
             return string
         
         elif self.tokenizer.next.t_type == "IDENTIFIER":
-            args = []
             result = self.tokenizer.next.value
             identi = Identifier(result, [])
             self.tokenizer.selectNext()
             if self.tokenizer.next.t_type == 'OPEN':
+                res = FuncCall(identi.value, [])
                 self.tokenizer.selectNext()
                 
                 if self.tokenizer.next.t_type != 'CLOSE':
                     arg = self.parseBoolExpression()
-                    args.append(arg)
+                    res.children.append(arg)
                     while self.tokenizer.next.t_type == 'VIRGULA':
                         self.tokenizer.selectNext()
                         arg = self.parseBoolExpression()
-                        args.append(arg)
+                        res.children.append(arg)
                     
                     if self.tokenizer.next.t_type == 'CLOSE':
                         self.tokenizer.selectNext()
-                        return FuncCall(identi.value, args)
+                        return res
                     
                 else:
                     self.tokenizer.selectNext()
-                    return FuncCall(identi.value, args)
+                    return res
             else:
                 return identi
     
@@ -313,15 +311,7 @@ class Parser:
             self.tokenizer.selectNext()
             return UnOp("!", [self.parseFactor()])
         
-        elif self.tokenizer.next.t_type == 'OPEN':
-            self.tokenizer.selectNext()
-            result = self.parseBoolExpression()
-            if self.tokenizer.next.t_type == 'CLOSE':
-                self.tokenizer.selectNext()
-                return result
-            else:
-                raise SyntaxError("Erro: Caractere inválido")
-            
+        
         elif self.tokenizer.next.t_type == "SCANLN":
             self.tokenizer.selectNext()
             if self.tokenizer.next.t_type == 'OPEN':
@@ -332,6 +322,17 @@ class Parser:
                         return Scan("Scanln", [])
                 else:
                     raise SyntaxError("Erro: Caractere inválido")
+        
+        elif self.tokenizer.next.t_type == 'OPEN':
+            self.tokenizer.selectNext()
+            result = self.parseBoolExpression()
+            if self.tokenizer.next.t_type == 'CLOSE':
+                self.tokenizer.selectNext()
+                return result
+            else:
+                raise SyntaxError("Erro: Caractere inválido")
+            
+        
         else:
             raise SyntaxError("Erro: Caractere inválido")
             

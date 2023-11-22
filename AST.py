@@ -23,46 +23,46 @@ class BinOp(Node):
         if self.value == "+":
             if left[1] != right[1] or left[1] != "int":
                 raise SyntaxError("ERRO BINOP +")
-            return (self.children[0].evaluate(ST)[0] + self.children[1].evaluate(ST)[0], "int")
+            return (left[0] + right[0], "int")
         
         elif self.value == "-":
             if left[1] != right[1] or left[1] != "int":
                 raise SyntaxError("ERRO BINOP -")
-            return (self.children[0].evaluate(ST)[0] - self.children[1].evaluate(ST)[0], "int")
+            return (left[0] - right[0], "int")
         
         elif self.value == "*":
             if left[1] != right[1] or left[1] != "int":
                 raise SyntaxError("ERRO BINOP *")
-            return (self.children[0].evaluate(ST)[0] * self.children[1].evaluate(ST)[0], "int")
+            return (left[0] * right[0], "int")
         
         elif self.value == "/":
             if left[1] != right[1] or left[1] != "int":
                 raise SyntaxError("ERRO BINOP /")
-            return (self.children[0].evaluate(ST)[0] // self.children[1].evaluate(ST)[0], "int")
+            return (left[0] // right[0], "int")
         
         elif self.value == "&&":
             if left[1] != right[1] or left[1] != "int":
                 raise SyntaxError("ERRO BINOP &&")
-            return (int(self.children[0].evaluate(ST)[0] and self.children[1].evaluate(ST)[0]), "int")
+            return (int(left[0] and right[0]), "int")
         
         elif self.value == "||":
             if left[1] != right[1] or left[1] != "int":
                 raise SyntaxError("ERRO BINOP ||")
-            return (int(self.children[0].evaluate(ST)[0] or self.children[1].evaluate(ST)[0]), "int")
+            return (int(left[0] or right[0]), "int")
         
         elif self.value == "<":
-            return (int(self.children[0].evaluate(ST)[0] < self.children[1].evaluate(ST)[0]), "int")
+            return (int(left[0] < right[0]), "int")
         
         elif self.value == ">":
-            return (int(self.children[0].evaluate(ST)[0] > self.children[1].evaluate(ST)[0]), "int")
+            return (int(left[0] > right[0]), "int")
         
         elif self.value == "==":
             if left[1] != right[1]:
                 raise SyntaxError("ERRO BINOP ==")
-            return (int(self.children[0].evaluate(ST)[0] == self.children[1].evaluate(ST)[0]), "int")
+            return (int(left[0] == right[0]), "int")
         
         elif self.value == ".":
-            return (str(self.children[0].evaluate(ST)[0]) + str(self.children[1].evaluate(ST)[0]), "string")
+            return (str(left[0]) + str(right[0]), "string")
 
 
 class UnOp(Node):
