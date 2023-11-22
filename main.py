@@ -117,7 +117,7 @@ class Parser:
                 self.tokenizer.selectNext()
                 result = Assigment(None, [identi, self.parseBoolExpression()])
                 if self.tokenizer.next.t_type == 'IDENTIFIER' or self.tokenizer.next.t_type == 'VIRGULA' or self.tokenizer.next.t_type == 'CLOSE':
-                    raise SyntaxError("Erro: NEWLINE IDENTIFIER")
+                    raise SyntaxError("Erro: Assigment")
                 return result
             elif self.tokenizer.next.t_type == 'OPEN':
                 self.tokenizer.selectNext()
