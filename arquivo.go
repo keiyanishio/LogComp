@@ -1,6 +1,6 @@
-func main() int {
-    Println(1)
-}
+// func main() int {
+//     Println(1)
+// }
 
 
 // func main() int {
@@ -26,3 +26,21 @@ func main() int {
 //     x1 = 1
 // }
 // }
+
+
+// Type diferente
+func main() int {
+    return "b"
+}
+
+
+// Type mismatch
+func ok(x string) string {
+    return x
+}
+
+func main() int {
+    var y int = ok("x")
+
+    Println(y)
+}

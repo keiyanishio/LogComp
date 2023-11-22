@@ -135,7 +135,10 @@ class VarDec(Node):
                 ST.create(self.children[0].value, ("", self.value))
             
         else:
-            ST.create(self.children[0].value, (self.children[1].evaluate(ST)[0], self.value))
+            tipo = self.children[1].evaluate(ST)
+            if self.value != tipo[1]:
+                raise SyntaxError("Tipo errado")
+            ST.create(self.children[0].value, (tipo[0], self.value))
             
             
 class StrVal(Node):
@@ -165,5 +168,12 @@ class FuncCall(Node):
         for i in range(len(self.children)):
             call[0].children[i+1].evaluate(nst)
             nst.setter(call[0].children[i+1].children[0].value, self.children[i].evaluate(ST))
-        return call[0].children[-1].evaluate(nst)
+        
+        result = call[0].children[-1].evaluate(nst)
+        
+        if result is not None:
+            if call[1] != result[1]:
+                raise SyntaxError("Tipo de função errado")
+            else:
+                return result
     
