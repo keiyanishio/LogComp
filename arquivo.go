@@ -1,6 +1,6 @@
-func main() int {
-    Println(1)
-}
+// func main() int {
+//     Println(1)
+// }
 
 
 // func main() int {
@@ -11,4 +11,10 @@ func main() int {
 // func main() int {
 //     var x int
 //     x = 1,
+// }
+
+
+// func main() int {
+//     var x int
+//     x = 2+3)
 // }
