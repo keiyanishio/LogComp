@@ -1,15 +1,12 @@
 # Compilador LogComp
 ![git status](http://3.129.230.99/svg/keiyanishio/LogComp/)
 
+This is a simple compiler written in Python that can read files written in Go and generate the corresponding output.
 
-## Roteiro 1
-![DS roteiro1](imgs/roteiro1.png)
-
-## Roteiro 2
-![DS roteiro2](imgs/roteiro2.png)
-
-## Roteiro 3 e 4
-![DS roteiro3](imgs/roteiro3.png)
+## Usage
+```
+python main.py file.go
+```
 
 ## Roteiro 5
 ![DS roteiro5](imgs/roteiro5.png)
