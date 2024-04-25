@@ -1,18 +1,13 @@
 # Compilador LogComp
-![git status](http://3.129.230.99/svg/keiyanishio/LogComp/)
 
-This is a simple compiler written in Python that can read files written in Go and generate the corresponding output.
+The Go to Python Compiler is a Python-based tool designed to translate GoLang code into Python, enabling seamless interoperability between these two languages.
 
 ## Usage
 ```
 python main.py file.go
 ```
 
-## Roteiro 5
-![DS roteiro5](imgs/roteiro5.png)
+## Versions
+- Version 2.4: Function Support
+- Version 3.0: Assembly Code Generation
 
-## Roteiro 6
-![DS roteiro6](imgs/roteiro6.png)
-
-## EBNF-Roteiro 5
-![EBNF](imgs/EBNF.png)
