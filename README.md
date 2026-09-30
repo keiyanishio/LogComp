@@ -1,4 +1,4 @@
-# LogComp — Interpreter and x86 Assembly Generator
+# LogComp — Compiler Construction Project
 
 Academic language-processing project developed in **2023** during my Computer Engineering studies at **Insper**.
 
